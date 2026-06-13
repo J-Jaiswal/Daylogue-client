@@ -1,10 +1,15 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-const TIME_OPTIONS = ["morning", "afternoon", "evening", "late_night"];
+const TIME_OPTIONS = [
+  { value: "morning",    label: "Morning" },
+  { value: "afternoon",  label: "Afternoon" },
+  { value: "evening",    label: "Evening" },
+  { value: "late_night", label: "Late Night" },
+];
 
 const emptyExercise = () => ({
-  id: Date.now(),
+  id: Date.now() + Math.random(),
   name: "",
   type: "sets_reps",
   sets: "",
@@ -16,20 +21,15 @@ export default function WorkoutForm({ sessions, onSave }) {
   const [timeOfDay, setTimeOfDay] = useState("morning");
   const [exercises, setExercises] = useState([emptyExercise()]);
 
-  const addExercise = () => {
-    setExercises([...exercises, emptyExercise()]);
-  };
+  const addExercise = () => setExercises([...exercises, emptyExercise()]);
 
   const removeExercise = (id) => {
     if (exercises.length === 1) return;
     setExercises(exercises.filter((e) => e.id !== id));
   };
 
-  const updateExercise = (id, field, value) => {
-    setExercises(
-      exercises.map((e) => (e.id === id ? { ...e, [field]: value } : e)),
-    );
-  };
+  const updateExercise = (id, field, value) =>
+    setExercises(exercises.map((e) => (e.id === id ? { ...e, [field]: value } : e)));
 
   const handleSave = () => {
     const valid = exercises.every((e) => {
@@ -51,25 +51,24 @@ export default function WorkoutForm({ sessions, onSave }) {
         type: e.type,
         sets: e.type === "sets_reps" ? Number(e.sets) : undefined,
         reps: e.type === "sets_reps" ? Number(e.reps) : undefined,
-        durationMinutes:
-          e.type === "duration" ? Number(e.durationMinutes) : undefined,
+        durationMinutes: e.type === "duration" ? Number(e.durationMinutes) : undefined,
       })),
     };
 
-    // append new session to existing sessions
     onSave([...(sessions || []), session]);
-
-    // reset form
     setTimeOfDay("morning");
     setExercises([emptyExercise()]);
     toast.success("Workout session added");
   };
 
+  const hasPreview = exercises.some((e) => e.name.trim());
+  const selectedTime = TIME_OPTIONS.find((t) => t.value === timeOfDay);
+
   return (
     <div className="workout-section-card">
       <span className="workout-card-header-label">WORKOUT</span>
 
-      {/* existing sessions summary */}
+      {/* Existing session badges */}
       {sessions?.length > 0 && (
         <div className="workout-sessions-summary-wrap">
           {sessions.map((s, i) => (
@@ -80,24 +79,21 @@ export default function WorkoutForm({ sessions, onSave }) {
         </div>
       )}
 
-      {/* time of day */}
+      {/* Session time — dropdown */}
       <div className="workout-input-group">
         <span className="workout-input-label">SESSION TIME</span>
-        <div className="workout-time-selector-row">
+        <select
+          className="workout-time-select"
+          value={timeOfDay}
+          onChange={(e) => setTimeOfDay(e.target.value)}
+        >
           {TIME_OPTIONS.map((t) => (
-            <button
-              key={t}
-              type="button"
-              className={`workout-time-pill-btn ${timeOfDay === t ? "active" : ""}`}
-              onClick={() => setTimeOfDay(t)}
-            >
-              {t.replace("_", " ").toUpperCase()}
-            </button>
+            <option key={t.value} value={t.value}>{t.label}</option>
           ))}
-        </div>
+        </select>
       </div>
 
-      {/* exercises */}
+      {/* Exercises */}
       <div className="workout-exercises-list-container">
         {exercises.map((exercise) => (
           <div key={exercise.id} className="workout-exercise-row-card">
@@ -107,16 +103,12 @@ export default function WorkoutForm({ sessions, onSave }) {
                 type="text"
                 placeholder="Exercise name (e.g. Bicep Curl)"
                 value={exercise.name}
-                onChange={(e) =>
-                  updateExercise(exercise.id, "name", e.target.value)
-                }
+                onChange={(e) => updateExercise(exercise.id, "name", e.target.value)}
               />
 
               <select
                 value={exercise.type}
-                onChange={(e) =>
-                  updateExercise(exercise.id, "type", e.target.value)
-                }
+                onChange={(e) => updateExercise(exercise.id, "type", e.target.value)}
                 className="workout-exercise-type-select"
               >
                 <option value="sets_reps">Sets × Reps</option>
@@ -142,9 +134,7 @@ export default function WorkoutForm({ sessions, onSave }) {
                     value={exercise.sets}
                     min="1"
                     className="workout-exercise-num-input"
-                    onChange={(e) =>
-                      updateExercise(exercise.id, "sets", e.target.value)
-                    }
+                    onChange={(e) => updateExercise(exercise.id, "sets", e.target.value)}
                   />
                   <span className="workout-exercise-multiply">×</span>
                   <input
@@ -153,9 +143,7 @@ export default function WorkoutForm({ sessions, onSave }) {
                     value={exercise.reps}
                     min="1"
                     className="workout-exercise-num-input"
-                    onChange={(e) =>
-                      updateExercise(exercise.id, "reps", e.target.value)
-                    }
+                    onChange={(e) => updateExercise(exercise.id, "reps", e.target.value)}
                   />
                 </div>
               ) : (
@@ -165,13 +153,7 @@ export default function WorkoutForm({ sessions, onSave }) {
                   value={exercise.durationMinutes}
                   min="1"
                   className="workout-exercise-duration-input"
-                  onChange={(e) =>
-                    updateExercise(
-                      exercise.id,
-                      "durationMinutes",
-                      e.target.value,
-                    )
-                  }
+                  onChange={(e) => updateExercise(exercise.id, "durationMinutes", e.target.value)}
                 />
               )}
             </div>
@@ -179,11 +161,35 @@ export default function WorkoutForm({ sessions, onSave }) {
         ))}
       </div>
 
+      {/* Live preview */}
+      {hasPreview && (
+        <div className="log-preview-card">
+          <span className="log-preview-label">PREVIEW</span>
+          <div className="log-preview-session-header">
+            <span className="log-preview-session-time">{selectedTime?.label}</span>
+          </div>
+          <div className="log-preview-chips">
+            {exercises
+              .filter((e) => e.name.trim())
+              .map((e, idx) => (
+                <span key={idx} className="log-preview-chip workout-chip">
+                  💪 {e.name}
+                  {e.type === "sets_reps" && e.sets && e.reps && (
+                    <em> {e.sets}×{e.reps}</em>
+                  )}
+                  {e.type === "duration" && e.durationMinutes && (
+                    <em> {e.durationMinutes}m</em>
+                  )}
+                </span>
+              ))}
+          </div>
+        </div>
+      )}
+
       <div className="workout-action-buttons">
         <button type="button" className="workout-add-exercise-btn" onClick={addExercise}>
           + Add Exercise
         </button>
-
         <button type="button" className="workout-save-session-btn" onClick={handleSave}>
           Save Session
         </button>

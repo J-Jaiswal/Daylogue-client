@@ -1,4 +1,16 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+
+function formatDuration(bedTime, wakeTime) {
+  if (!bedTime || !wakeTime) return null;
+  const [bh, bm] = bedTime.split(":").map(Number);
+  const [wh, wm] = wakeTime.split(":").map(Number);
+  let totalMins = wh * 60 + wm - (bh * 60 + bm);
+  if (totalMins < 0) totalMins += 24 * 60; // crosses midnight
+  if (totalMins <= 0) return null;
+  const h = Math.floor(totalMins / 60);
+  const m = totalMins % 60;
+  return m > 0 ? `${h}h ${m}m` : `${h}h`;
+}
 
 export default function SleepForm({ initial, onSave }) {
   const [form, setForm] = useState({
@@ -13,11 +25,15 @@ export default function SleepForm({ initial, onSave }) {
 
   const handleSave = () => {
     if (!form.bedTime || !form.wakeTime) return;
-    onSave({
-      bedTime: form.bedTime,
-      wakeTime: form.wakeTime,
-    });
+    onSave({ bedTime: form.bedTime, wakeTime: form.wakeTime });
   };
+
+  const duration = useMemo(
+    () => formatDuration(form.bedTime, form.wakeTime),
+    [form.bedTime, form.wakeTime]
+  );
+
+  const hasPreview = form.bedTime && form.wakeTime;
 
   return (
     <div className="sleep-section-card">
@@ -62,6 +78,24 @@ export default function SleepForm({ initial, onSave }) {
           </div>
         </div>
       </div>
+
+      {/* Live preview */}
+      {hasPreview && (
+        <div className="log-preview-card sleep-preview">
+          <span className="log-preview-label">PREVIEW</span>
+          <div className="sleep-preview-body">
+            <span className="sleep-preview-icon">🌙</span>
+            <div className="sleep-preview-text">
+              <span className="sleep-preview-times">
+                {form.bedTime} <span className="sleep-preview-arrow">→</span> {form.wakeTime}
+              </span>
+              {duration && (
+                <span className="sleep-preview-duration">{duration}</span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <button
         className="sleep-save-btn"

@@ -41,7 +41,7 @@
 .auth-card {
   width: 100%;
   max-width: 420px;
-  background: rgba(17, 18, 28, 0.8);
+  background: var(--bg-card);
   border: 1px solid var(--border-strong);
   border-radius: var(--r-2xl);
   padding: 36px 32px;
@@ -58,7 +58,7 @@
   letter-spacing: -0.04em;
   text-align: center;
   margin-bottom: 6px;
-  background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+  background: linear-gradient(135deg, var(--text) 30%, var(--accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

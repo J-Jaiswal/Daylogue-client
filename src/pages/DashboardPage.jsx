@@ -2,8 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTodayLog } from "../hooks/useTodayLog";
 import LiveDate from "../components/home/LiveDate";
-import LogStatusCard from "../components/home/LogStatusCard";
-import MomentumIndicator from "../components/home/MomentumIndicator";
 import AISuggestionCards from "../components/home/AISuggestionCards";
 import PerformanceScore from "../components/home/PerformanceScore";
 
@@ -46,21 +44,9 @@ export default function DashboardPage() {
         )}
       </section>
 
-      <section className="dashboard-grid">
-        <div className="dashboard-primary">
-          {!isLoading && <PerformanceScore log={todayLog} />}
-          {!isLoading && <LogStatusCard log={todayLog} />}
-          <button
-            className="btn-primary quick-log-btn"
-            onClick={() => navigate("/log")}
-          >
-            Add Today's Log
-          </button>
-          <AISuggestionCards />
-        </div>
-        <aside className="dashboard-secondary">
-          <MomentumIndicator />
-        </aside>
+      <section className="dashboard-single-col">
+        <AISuggestionCards />
+        {!isLoading && <PerformanceScore log={todayLog} />}
       </section>
     </div>
   );

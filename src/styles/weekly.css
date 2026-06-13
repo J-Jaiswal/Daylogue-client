@@ -184,3 +184,18 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+@media (max-width: 420px) {
+  .weekly-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .weekly-narrative {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .weekly-narrative-text p {
+    font-size: 13.5px;
+  }
+}

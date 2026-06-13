@@ -206,3 +206,18 @@
   padding: 40px 0;
   font-size: 14px;
 }
+
+@media (max-width: 480px) {
+  .page {
+    padding: 20px 14px 100px;
+  }
+
+  .page-title {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

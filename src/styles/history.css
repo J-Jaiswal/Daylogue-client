@@ -1,5 +1,5 @@
 /* =====================================================
-   HISTORY — Per-day list view
+   HISTORY — Collapsible per-day list + Pagination
    ===================================================== */
 .history-page {
   max-width: 780px;
@@ -17,7 +17,7 @@
 .day-log-list-wrap {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 /* Date range tabs */
@@ -79,8 +79,21 @@
   color: var(--accent);
 }
 
-/* Result count */
+/* Result count + page info row */
+.history-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .history-result-count {
+  font-size: 12px;
+  color: var(--text-3);
+  font-weight: 600;
+}
+
+.history-page-info {
   font-size: 12px;
   color: var(--text-3);
   font-weight: 600;
@@ -90,91 +103,165 @@
 .day-log-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
-/* ---- Single day card ---- */
+/* =====================================================
+   COLLAPSIBLE DAY LOG CARD
+   ===================================================== */
 .day-log-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--r-xl);
-  padding: 18px 20px;
   backdrop-filter: blur(12px);
   box-shadow: var(--shadow-sm);
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
   animation: fadeUp 0.3s ease both;
 }
 
 .day-log-card:hover {
   border-color: var(--border-strong);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
 }
 
-/* Header */
+.day-log-card.expanded {
+  border-color: var(--accent-border);
+  box-shadow: var(--shadow-md);
+}
+
+/* Header — the always-visible clickable row */
 .day-log-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 14px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.day-log-card-header:hover {
+  background: var(--bg-card-hover);
+}
+
+.day-log-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.day-log-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .day-log-date {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 800;
   color: var(--text);
   letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+/* Mini pillar icons shown when collapsed */
+.day-log-mini-pillars {
+  display: flex;
+  gap: 4px;
+}
+
+.mini-pillar {
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0.75;
 }
 
 /* Score badge */
 .day-score-badge {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   border: 1.5px solid;
   border-radius: 999px;
-  padding: 3px 12px;
+  padding: 3px 10px;
   background: transparent;
 }
 
 .day-score-number {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 900;
   letter-spacing: -0.02em;
 }
 
 .day-score-label {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
   opacity: 0.85;
 }
 
 /* Missed badge */
 .day-missed-badge {
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-3);
   background: var(--bg-input);
   border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 3px 12px;
+  padding: 3px 10px;
 }
 
-/* Empty day */
-.day-log-empty {
-  font-size: 13px;
+/* Chevron */
+.day-log-chevron {
   color: var(--text-3);
-  padding: 4px 0;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
 }
 
-/* ---- Log sections ---- */
+.day-log-chevron.open {
+  transform: rotate(180deg);
+  color: var(--accent);
+}
+
+/* =====================================================
+   COLLAPSIBLE EXPAND/COLLAPSE ANIMATION
+   ===================================================== */
+.day-log-detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.day-log-detail.open {
+  grid-template-rows: 1fr;
+}
+
+.day-log-detail-inner {
+  overflow: hidden;
+  padding: 0 20px;
+  transition: padding 0.3s ease;
+}
+
+.day-log-detail.open .day-log-detail-inner {
+  padding: 0 20px 18px;
+}
+
+/* Top separator line when expanded */
+.day-log-card.expanded .day-log-card-header {
+  border-bottom: 1px solid var(--border);
+}
+
+/* ---- Log sections inside detail ---- */
 .day-log-sections {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  padding-top: 14px;
 }
 
 .day-log-section {
@@ -184,7 +271,7 @@
 }
 
 .day-log-section-icon {
-  font-size: 16px;
+  font-size: 15px;
   width: 22px;
   flex-shrink: 0;
   margin-top: 1px;
@@ -198,7 +285,7 @@
 }
 
 .day-log-section-title {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 800;
   color: var(--text-3);
   text-transform: uppercase;
@@ -222,6 +309,12 @@
   font-style: italic;
 }
 
+.day-log-empty {
+  font-size: 13px;
+  color: var(--text-3);
+  padding: 14px 0 4px;
+}
+
 /* Workouts */
 .day-log-workouts {
   display: flex;
@@ -233,11 +326,11 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 .day-log-session-time {
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 800;
   color: var(--accent);
   text-transform: uppercase;
@@ -248,7 +341,7 @@
 }
 
 .day-log-exercise {
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--text);
   background: var(--bg-input);
   border: 1px solid var(--border);
@@ -267,17 +360,45 @@
 .day-log-meals {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
 }
 
 .day-log-meal-chip {
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--text);
   background: var(--green-soft);
-  border: 1px solid rgba(16,217,160,0.25);
+  border: 1px solid rgba(16,217,160,0.22);
   border-radius: 999px;
   padding: 2px 10px;
   font-weight: 600;
+}
+
+.day-log-meal-chip em {
+  color: var(--text-3);
+  font-style: normal;
+  font-weight: 400;
+}
+
+/* Drinks */
+.day-log-drinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.day-log-drink-chip {
+  font-size: 12px;
+  color: var(--text);
+  background: rgba(56,189,248,0.08);
+  border: 1px solid rgba(56,189,248,0.22);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-weight: 600;
+}
+
+.day-log-drink-chip em {
+  color: var(--text-3);
+  font-style: normal;
 }
 
 /* AI coach section */
@@ -291,7 +412,7 @@
 
 .day-log-ai-title {
   display: block;
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 800;
   color: var(--accent);
   text-transform: uppercase;
@@ -317,7 +438,7 @@
   font-weight: 700;
 }
 
-/* Empty / no-match state */
+/* ---- Empty / no-match state ---- */
 .history-empty {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -331,14 +452,109 @@
   font-size: 14px;
 }
 
+/* =====================================================
+   PAGINATION
+   ===================================================== */
+.history-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 0 4px;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--bg-card);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.pagination-pages {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pagination-page-btn {
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+}
+
+.pagination-page-btn:hover:not(.active) {
+  background: var(--bg-card-hover);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.pagination-page-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
 @media (max-width: 560px) {
   .date-range-tabs,
   .filter-pills {
     flex-wrap: wrap;
   }
+
   .day-log-card-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    padding: 13px 14px;
+  }
+
+  .day-log-detail-inner {
+    padding: 0 14px;
+  }
+
+  .day-log-detail.open .day-log-detail-inner {
+    padding: 0 14px 14px;
+  }
+
+  .day-log-date {
+    font-size: 13.5px;
+  }
+
+  .pagination-pages {
+    order: -1;
+    width: 100%;
+  }
+
+  .history-pagination {
+    gap: 6px;
   }
 }
