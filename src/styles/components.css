@@ -1,0 +1,208 @@
+/* =====================================================
+   COMPONENTS — buttons, forms, cards, shared utilities
+   ===================================================== */
+
+/* --- Primary button --- */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 22px;
+  background: linear-gradient(135deg, var(--accent), #9b55ff);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-md);
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.2s, filter 0.2s;
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px var(--accent-glow);
+  filter: brightness(1.08);
+}
+
+.btn-primary:hover:not(:disabled)::before { opacity: 1; }
+
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.97) translateY(0);
+  box-shadow: 0 2px 10px var(--accent-glow);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* --- Secondary button --- */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 11px 22px;
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  font-size: 14.5px;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: background 0.18s, border-color 0.18s, transform 0.15s;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-border);
+  transform: translateY(-1px);
+}
+
+.btn-secondary:active:not(:disabled) { transform: scale(0.97); }
+
+.btn-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* --- Ghost button --- */
+.btn-ghost {
+  background: transparent;
+  border: none;
+  color: var(--text-2);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: var(--r-sm);
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-ghost:hover {
+  background: var(--bg-card-hover);
+  color: var(--text);
+}
+
+/* --- Form elements --- */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 11px 14px;
+  color: var(--text);
+  transition: border-color 0.18s, box-shadow 0.18s;
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--text-3);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+/* --- Page wrapper --- */
+.page {
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 28px 18px 90px;
+  animation: fadeUp 0.4s ease both;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 22px;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+/* --- Glass card --- */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 18px;
+  backdrop-filter: blur(12px);
+}
+
+/* --- Remove button --- */
+.remove-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-3);
+  border-radius: var(--r-sm);
+  padding: 5px 9px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.remove-btn:hover:not(:disabled) {
+  background: var(--red-soft);
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.remove-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+/* --- Empty state --- */
+.empty-state {
+  color: var(--text-3);
+  text-align: center;
+  padding: 40px 0;
+  font-size: 14px;
+}

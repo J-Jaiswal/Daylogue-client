@@ -1,0 +1,662 @@
+/* =====================================================
+   CINEMATIC TODAY'S LOG PAGE — SPACE STYLE
+   ===================================================== */
+
+.log-page-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 120px);
+  padding: 20px 0;
+  animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.log-page-centered {
+  width: 100%;
+  max-width: 560px; /* layout max width 560px */
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.log-page-title {
+  font-size: 28px; /* 28px bold */
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+/* --- Segmented Tab Switcher --- */
+.log-segmented-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  background: rgba(17, 17, 24, 0.6);
+  border: 1px solid var(--border);
+  border-radius: 50px; /* 50px radius pill switcher */
+  padding: 6px;
+  backdrop-filter: blur(12px);
+}
+
+.log-segmented-tab {
+  background: transparent;
+  border: none;
+  border-radius: 50px; /* 50px radius pill shape */
+  color: var(--text-2);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 12px 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.log-segmented-tab:hover {
+  color: #FFFFFF;
+}
+
+/* Active tab: violet fill */
+.log-segmented-tab.active {
+  background: var(--accent);
+  color: #FFFFFF;
+  box-shadow: 0 4px 16px rgba(124, 92, 252, 0.4);
+}
+
+/* Completed tabs: filled with emerald green + checkmark */
+.log-segmented-tab.completed:not(.active) {
+  background: rgba(29, 184, 142, 0.15);
+  color: var(--green);
+  border: 1px solid rgba(29, 184, 142, 0.3);
+}
+
+.log-segmented-tab.completed.active {
+  background: var(--accent);
+  color: #FFFFFF;
+  box-shadow: 0 4px 16px rgba(124, 92, 252, 0.4);
+}
+
+/* --- Section Content Card --- */
+.log-section-content-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px; /* 20px radius frosted card */
+  padding: 30px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+}
+
+.log-section-content-wrapper:hover {
+  border-color: rgba(124, 92, 252, 0.15);
+}
+
+.sleep-section-card,
+.workout-section-card,
+.meal-section-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeIn 0.4s ease both;
+}
+
+.sleep-card-header-label,
+.workout-card-header-label,
+.meal-card-header-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: var(--text-2);
+  text-transform: uppercase;
+  display: block;
+}
+
+/* --- Sleep Form Inputs --- */
+.sleep-inputs-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.sleep-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sleep-input-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--text-2);
+}
+
+.sleep-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sleep-time-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 14px; /* dark rounded input */
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px 44px 14px 18px;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.sleep-time-input:focus {
+  border-color: rgba(124, 92, 252, 0.5);
+  background: rgba(17, 17, 24, 0.9);
+  box-shadow: 0 0 0 1px rgba(124, 92, 252, 0.4); /* violet glow on focus */
+}
+
+/* hide webkit indicators */
+.sleep-time-input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+  position: absolute;
+  right: 18px;
+  width: 20px;
+  height: 20px;
+}
+
+.sleep-clock-icon {
+  position: absolute;
+  right: 18px;
+  color: var(--text-2);
+  pointer-events: none; /* clock icon right-aligned */
+  display: flex;
+  align-items: center;
+}
+
+.sleep-save-btn {
+  background: var(--accent);
+  border: none;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  border-radius: 50px; /* full-width violet pill button */
+  height: 48px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(124, 92, 252, 0.3);
+  width: 100%;
+  margin-top: 10px;
+}
+
+.sleep-save-btn:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: 0 12px 30px rgba(124, 92, 252, 0.45);
+}
+
+.sleep-save-btn:disabled {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-3);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.log-back-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: center;
+  transition: color 0.2s ease;
+  margin-top: 4px;
+}
+
+.log-back-btn:hover {
+  color: #FFFFFF;
+}
+
+/* --- Workout Form Styling --- */
+.workout-sessions-summary-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.workout-session-badge {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 5px 12px;
+  background: rgba(124, 92, 252, 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(124, 92, 252, 0.2);
+  border-radius: 50px;
+}
+
+.workout-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.workout-input-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--text-2);
+}
+
+.workout-time-selector-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.workout-time-pill-btn {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  color: var(--text-2);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 10px 4px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.workout-time-pill-btn:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+}
+
+.workout-time-pill-btn.active {
+  background: var(--accent);
+  border-color: transparent;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(124, 92, 252, 0.3);
+}
+
+/* Exercises items card list */
+.workout-exercises-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.workout-exercise-row-card {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.25s ease;
+}
+
+.workout-exercise-row-card:focus-within {
+  border-color: rgba(124, 92, 252, 0.3);
+}
+
+.workout-exercise-row-top {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.workout-exercise-name-input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 14px;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.workout-exercise-name-input:focus {
+  border-color: rgba(124, 92, 252, 0.4);
+}
+
+.workout-exercise-type-select {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 14px;
+  outline: none;
+  cursor: pointer;
+}
+
+.workout-exercise-remove-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px;
+  transition: color 0.2s ease;
+}
+
+.workout-exercise-remove-btn:hover:not(:disabled) {
+  color: var(--red);
+}
+
+.workout-exercise-remove-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.workout-exercise-row-bottom {
+  display: flex;
+}
+
+.workout-sets-reps-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.workout-exercise-num-input {
+  width: 80px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 14px;
+  text-align: center;
+  outline: none;
+}
+
+.workout-exercise-num-input:focus {
+  border-color: rgba(124, 92, 252, 0.4);
+}
+
+.workout-exercise-multiply {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-3);
+}
+
+.workout-exercise-duration-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 14px;
+  outline: none;
+}
+
+.workout-exercise-duration-input:focus {
+  border-color: rgba(124, 92, 252, 0.4);
+}
+
+/* action buttons */
+.workout-action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.workout-add-exercise-btn {
+  background: transparent;
+  border: 1px dashed var(--border-strong);
+  border-radius: 50px;
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  height: 48px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.workout-add-exercise-btn:hover {
+  border-color: var(--accent);
+  color: #FFFFFF;
+}
+
+.workout-save-session-btn {
+  background: var(--accent);
+  border: none;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  border-radius: 50px;
+  height: 48px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(124, 92, 252, 0.25);
+}
+
+.workout-save-session-btn:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 12px 28px rgba(124, 92, 252, 0.4);
+}
+
+/* --- Nutrition / Meals Forms --- */
+.meal-sessions-summary-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.meal-session-badge {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 5px 12px;
+  background: rgba(29, 184, 142, 0.1);
+  color: var(--green);
+  border: 1px solid rgba(29, 184, 142, 0.2);
+  border-radius: 50px;
+}
+
+.meal-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meal-input-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--text-2);
+}
+
+.meal-category-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.meal-category-btn {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--text-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 4px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.meal-category-btn:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+}
+
+.meal-category-btn.active {
+  background: var(--accent);
+  border-color: transparent;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(124, 92, 252, 0.3);
+}
+
+.meal-cat-icon {
+  font-size: 18px;
+}
+
+.meal-cat-name {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.meal-items-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.meal-item-row-card {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px 14px;
+}
+
+.meal-item-text-input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 14px;
+  outline: none;
+  min-width: 0;
+  transition: all 0.25s ease;
+}
+
+.meal-item-text-input:focus {
+  border-color: rgba(124, 92, 252, 0.4);
+}
+
+.meal-item-remove-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px;
+  transition: color 0.2s ease;
+}
+
+.meal-item-remove-btn:hover:not(:disabled) {
+  color: var(--red);
+}
+
+.meal-item-remove-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.meal-action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.meal-add-item-btn {
+  background: transparent;
+  border: 1px dashed var(--border-strong);
+  border-radius: 50px;
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  height: 48px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.meal-add-item-btn:hover {
+  border-color: var(--accent);
+  color: #FFFFFF;
+}
+
+.meal-save-btn {
+  background: var(--accent);
+  border: none;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  border-radius: 50px;
+  height: 48px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(124, 92, 252, 0.25);
+}
+
+.meal-save-btn:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 12px 28px rgba(124, 92, 252, 0.4);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 580px) {
+  .log-page-centered {
+    padding: 0 16px;
+  }
+  .sleep-inputs-row {
+    grid-template-columns: 1fr;
+  }
+  .workout-time-selector-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .workout-exercise-row-top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .workout-exercise-remove-btn {
+    align-self: flex-end;
+  }
+  .meal-item-row-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .meal-item-remove-btn {
+    align-self: flex-end;
+  }
+}

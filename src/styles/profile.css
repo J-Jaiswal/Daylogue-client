@@ -1,0 +1,493 @@
+/* =====================================================
+   CINEMATIC PROFILE PAGE — SPACE STYLE
+   ===================================================== */
+
+.profile-page-container {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 10px 0;
+  animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* --- cinematic header --- */
+.profile-cinematic-header {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 32px;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px; /* Frosted glass styling spec */
+  padding: 30px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+}
+
+.profile-cinematic-header::before {
+  content: "";
+  position: absolute;
+  top: -120px;
+  right: -120px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(124, 92, 252, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.profile-cinematic-header:hover {
+  border-color: rgba(124, 92, 252, 0.2);
+}
+
+.profile-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Avatar circle left */
+.profile-avatar-gradient {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7C5CFC, #4C2FD9);
+  color: #FFFFFF;
+  font-size: 36px;
+  font-weight: 800;
+  box-shadow: 0 8px 24px rgba(124, 92, 252, 0.3);
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.profile-meta-text h2 {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin-bottom: 4px;
+}
+
+.profile-bio-text {
+  color: var(--text-2);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Floating Card top-right: Current Phase */
+.profile-floating-phase-card {
+  background: rgba(17, 17, 24, 0.6);
+  border: 1px solid rgba(124, 92, 252, 0.4);
+  border-radius: 20px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 15px rgba(124, 92, 252, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-self: stretch;
+  justify-content: center;
+}
+
+.phase-card-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: var(--text-2);
+  text-transform: uppercase;
+}
+
+.phase-card-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+}
+
+.phase-card-context {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+/* --- Sticky Segmented Control --- */
+.profile-nav-sticky-wrap {
+  position: sticky;
+  top: 76px;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  padding: 10px 0;
+}
+
+.profile-nav-segmented {
+  pointer-events: auto;
+  display: inline-flex;
+  background: rgba(17, 17, 24, 0.85);
+  border: 1px solid var(--border);
+  border-radius: 50px; /* spec button radius */
+  padding: 6px;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  gap: 4px;
+}
+
+.profile-nav-btn {
+  background: transparent;
+  border: none;
+  border-radius: 50px;
+  color: var(--text-2);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.profile-nav-btn:hover {
+  color: #FFFFFF;
+}
+
+.profile-nav-btn.active {
+  background: var(--accent);
+  color: #FFFFFF;
+  box-shadow: 0 4px 16px rgba(124, 92, 252, 0.4);
+}
+
+/* --- Sections --- */
+.profile-content-scroll-area {
+  position: relative;
+  z-index: 1;
+}
+
+.profile-cinematic-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 30px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  margin-top: 10px;
+}
+
+/* --- Input elements --- */
+.profile-input-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.cinematic-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cinematic-input-wrapper.full-width-field {
+  grid-column: span 2;
+}
+
+.input-label-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: var(--text-2);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.cinematic-text-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px 18px;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.cinematic-text-input:focus {
+  border-color: rgba(124, 92, 252, 0.5);
+  background: rgba(17, 17, 24, 0.9);
+  box-shadow: 0 0 0 1px rgba(124, 92, 252, 0.4);
+}
+
+.cinematic-textarea-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  color: #FFFFFF;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+  padding: 14px 18px;
+  outline: none;
+  resize: vertical;
+  transition: all 0.25s ease;
+}
+
+.cinematic-textarea-input:focus {
+  border-color: rgba(124, 92, 252, 0.5);
+  background: rgba(17, 17, 24, 0.9);
+  box-shadow: 0 0 0 1px rgba(124, 92, 252, 0.4);
+}
+
+/* --- Buttons --- */
+.cinematic-btn-primary {
+  background: var(--accent);
+  border: none;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  border-radius: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(124, 92, 252, 0.3);
+}
+
+.cinematic-btn-primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(124, 92, 252, 0.45);
+}
+
+.cinematic-btn-primary:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-3);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.full-width-cta {
+  width: 100%;
+  height: 48px;
+}
+
+.btn-height-50 {
+  height: 50px;
+}
+
+/* --- Phase grid (2x2) --- */
+.cinematic-section-desc {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.phase-asymmetric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 10px;
+  margin-bottom: 24px;
+}
+
+.phase-cinematic-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.phase-cinematic-card:hover {
+  transform: scale(1.02);
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.phase-card-badge {
+  align-self: flex-start;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-2);
+  transition: all 0.25s ease;
+}
+
+.phase-card-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+/* Active phase card */
+.phase-cinematic-card.active {
+  background: rgba(124, 92, 252, 0.08);
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(124, 92, 252, 0.15);
+}
+
+.phase-cinematic-card.active .phase-card-badge {
+  background: var(--accent);
+  color: #FFFFFF;
+}
+
+/* --- Life Context Selector (Scroll Row) --- */
+.context-selector-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.context-chip-row-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.context-cinematic-chip {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+}
+
+.context-cinematic-chip:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+}
+
+.context-cinematic-chip.active {
+  background: var(--accent);
+  border-color: transparent;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(124, 92, 252, 0.3);
+}
+
+/* --- Phase History --- */
+.phase-cinematic-history-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.history-cinematic-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  transition: all 0.25s ease;
+}
+
+.history-cinematic-item:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.history-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.history-item-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.history-item-status-pill {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-2);
+}
+
+.history-item-status-pill.active {
+  background: rgba(29, 184, 142, 0.15);
+  color: var(--green);
+  border: 1px solid rgba(29, 184, 142, 0.3);
+}
+
+.history-item-context {
+  font-size: 13px;
+  color: var(--text-2);
+  margin-bottom: 4px;
+}
+
+.history-item-date {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.history-item-notes {
+  border-top: 1px solid var(--border);
+  margin-top: 14px;
+  padding-top: 14px;
+  font-size: 13.5px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.cinematic-empty-state {
+  color: var(--text-3);
+  font-size: 14px;
+  text-align: center;
+  padding: 40px 0;
+}
+
+/* Margin helpers */
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+.mt-28 { margin-top: 28px; }
+
+/* Utilities */
+.fade-in {
+  animation: fadeIn 0.4s ease both;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 780px) {
+  .profile-cinematic-header {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .profile-input-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cinematic-input-wrapper.full-width-field {
+    grid-column: span 1;
+  }
+
+  .phase-asymmetric-grid {
+    grid-template-columns: 1fr;
+  }
+}
