@@ -13,7 +13,17 @@ const authHeader = (token) => ({ Authorization: `Bearer ${token}` });
 export const logApi = {
   upsertLog: async (token, data) => {
     if (isDummyToken(token)) {
-      return { log: { ...dummyTodayLog(), ...data } };
+      const targetDate = data.date || "2026-06-14";
+      let log = DUMMY_LOGS.find((l) => l.date === targetDate);
+      if (!log) {
+        log = { date: targetDate, sleep: null, workouts: [], meals: [] };
+        DUMMY_LOGS.push(log);
+      }
+      Object.assign(log, data);
+      if (log.sleep && Array.isArray(log.sleep.entries)) {
+        log.sleep.durationMinutes = log.sleep.entries.reduce((sum, e) => sum + (e.durationMinutes || 0), 0);
+      }
+      return { log };
     }
 
     const res = await axios.post(`${BASE}/logs`, data, {
@@ -72,6 +82,12 @@ export const logApi = {
 
   deleteLog: async (token, date) => {
     if (isDummyToken(token)) {
+      const log = DUMMY_LOGS.find((l) => l.date === date);
+      if (log) {
+        log.sleep = null;
+        log.workouts = [];
+        log.meals = [];
+      }
       return { message: `Dummy log for ${date} cleared` };
     }
 

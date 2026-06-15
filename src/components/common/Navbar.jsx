@@ -8,7 +8,7 @@ const navItems = [
   { path: "/dashboard", label: "Dashboard" },
   { path: "/log", label: "Log" },
   { path: "/history", label: "History" },
-  { path: "/weekly", label: "Weekly" },
+//  { path: "/weekly", label: "Weekly" },
   { path: "/chat", label: "Coach" },
   { path: "/profile", label: "Profile" },
 ];

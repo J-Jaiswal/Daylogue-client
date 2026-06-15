@@ -231,7 +231,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 200;
+  z-index: 9999;
   height: 64px;
   background: rgba(12, 13, 20, 0.9);
   backdrop-filter: blur(24px) saturate(180%);

@@ -21,15 +21,29 @@ const mealCategoryIcons = {
 };
 
 const drinkIcons = {
-  water:   "💧",
-  coffee:  "☕",
-  tea:     "🍵",
-  juice:   "🥤",
-  protein: "🧃",
-  alcohol: "🍺",
-  soda:    "🥃",
-  other:   "🫗",
+  water:         "💧",
+  coffee:        "☕",
+  tea:           "🍵",
+  juice:         "🥤",
+  protein_shake: "🧃",
+  alcohol:       "🍺",
+  soda:          "🥃",
+  other:         "🫗",
 };
+
+const drinkLabels = {
+  water:         "Water",
+  coffee:        "Coffee",
+  tea:           "Tea",
+  juice:         "Juice",
+  protein_shake: "Protein Shake",
+  alcohol:       "Alcohol",
+  soda:          "Soda",
+};
+
+const DRINK_CATEGORIES = new Set([
+  "water", "coffee", "tea", "juice", "protein_shake", "alcohol", "soda"
+]);
 
 const timeLabels = {
   morning:    "Morning",
@@ -46,6 +60,9 @@ export default function DayLogCard({ date, log }) {
   const { label: scoreLabel, color: scoreColor } = score !== null
     ? getScoreLabel(score)
     : { label: "", color: "" };
+
+  const hasMeals = (log?.meals || []).some((m) => !DRINK_CATEGORIES.has(m.category));
+  const hasDrinks = (log?.meals || []).some((m) => DRINK_CATEGORIES.has(m.category));
 
   let aiSuggestions = [];
   if (log?.aiDailySuggestion) {
@@ -68,8 +85,8 @@ export default function DayLogCard({ date, log }) {
             <div className="day-log-mini-pillars">
               {log.sleep?.bedTime   && <span className="mini-pillar sleep-p">🌙</span>}
               {log.workouts?.length > 0 && <span className="mini-pillar workout-p">💪</span>}
-              {log.meals?.length    > 0 && <span className="mini-pillar meal-p">🥗</span>}
-              {log.drinks?.length   > 0 && <span className="mini-pillar drink-p">💧</span>}
+              {hasMeals             && <span className="mini-pillar meal-p">🥗</span>}
+              {hasDrinks            && <span className="mini-pillar drink-p">💧</span>}
             </div>
           )}
         </div>
@@ -160,17 +177,24 @@ export default function DayLogCard({ date, log }) {
                 <span className="day-log-section-icon">🥗</span>
                 <div className="day-log-section-body">
                   <span className="day-log-section-title">Nutrition</span>
-                  {log.meals?.length > 0 ? (
+                  {hasMeals ? (
                     <div className="day-log-meals">
-                      {log.meals.map((meal, i) => (
-                        <span key={i} className="day-log-meal-chip">
-                          {mealCategoryIcons[meal.category]}{" "}
-                          {mealCategoryLabels[meal.category] || meal.category}
-                          {meal.items?.length > 0 && (
-                            <em> · {meal.items.length} item{meal.items.length > 1 ? "s" : ""}</em>
-                          )}
-                        </span>
-                      ))}
+                      {log.meals
+                        .filter((m) => !DRINK_CATEGORIES.has(m.category))
+                        .map((meal, i) => (
+                          <span key={i} className="day-log-meal-chip">
+                            {mealCategoryIcons[meal.category]}{" "}
+                            {mealCategoryLabels[meal.category] || meal.category}
+                            {meal.items?.length > 0 && (
+                              <em>
+                                {" "}·{" "}
+                                {meal.items
+                                  .map((it) => `${it.name}${it.amount ? ` (${it.amount})` : ""}`)
+                                  .join(", ")}
+                              </em>
+                            )}
+                          </span>
+                        ))}
                     </div>
                   ) : (
                     <span className="day-log-section-missing">Not logged</span>
@@ -179,18 +203,27 @@ export default function DayLogCard({ date, log }) {
               </div>
 
               {/* Drinks */}
-              {(log.drinks?.length > 0) && (
+              {hasDrinks && (
                 <div className="day-log-section">
                   <span className="day-log-section-icon">💧</span>
                   <div className="day-log-section-body">
                     <span className="day-log-section-title">Drinks</span>
                     <div className="day-log-drinks">
-                      {log.drinks.map((d, i) => (
-                        <span key={i} className="day-log-drink-chip">
-                          {drinkIcons[d.category] || "🫗"} {d.quantity}
-                          {d.note && <em> ({d.note})</em>}
-                        </span>
-                      ))}
+                      {log.meals
+                        .filter((m) => DRINK_CATEGORIES.has(m.category))
+                        .map((meal, i) =>
+                          meal.items?.map((item, j) => {
+                            const label = drinkLabels[meal.category] || meal.category;
+                            const hasCustomName = item.name && item.name.toLowerCase() !== label.toLowerCase();
+                            return (
+                              <span key={`${i}-${j}`} className="day-log-drink-chip">
+                                {drinkIcons[meal.category] || "🫗"}{" "}
+                                {label} · {item.amount}
+                                {hasCustomName && <em> ({item.name})</em>}
+                              </span>
+                            );
+                          })
+                        )}
                     </div>
                   </div>
                 </div>

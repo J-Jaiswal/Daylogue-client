@@ -29,19 +29,23 @@ function buildDateRange(days) {
   return dates;
 }
 
+const DRINK_CATEGORIES = new Set([
+  "water", "coffee", "tea", "juice", "protein_shake", "alcohol", "soda"
+]);
+
 function passesFilter(entry, filter) {
   const { log } = entry;
   switch (filter) {
     case "all":      return true;
     case "slept":    return !!log?.sleep?.bedTime;
     case "trained":  return (log?.workouts?.length ?? 0) > 0;
-    case "meals":    return (log?.meals?.length ?? 0) > 0;
-    case "drinks":   return (log?.drinks?.length ?? 0) > 0;
+    case "meals":    return (log?.meals || []).some((m) => !DRINK_CATEGORIES.has(m.category));
+    case "drinks":   return (log?.meals || []).some((m) => DRINK_CATEGORIES.has(m.category));
     case "complete": {
       if (!log) return false;
       return !!log.sleep?.bedTime &&
              (log.workouts?.length ?? 0) > 0 &&
-             (log.meals?.length ?? 0) > 0;
+             (log.meals || []).some((m) => !DRINK_CATEGORIES.has(m.category));
     }
     case "missed": return !log;
     default:       return true;

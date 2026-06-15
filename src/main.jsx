@@ -11,7 +11,7 @@ import "./styles/auth.css";
 import "./styles/home.css";
 import "./styles/log.css";
 import "./styles/history.css";
-import "./styles/weekly.css";
+// import "./styles/weekly.css";
 import "./styles/chat.css";
 import "./styles/profile.css";
 
