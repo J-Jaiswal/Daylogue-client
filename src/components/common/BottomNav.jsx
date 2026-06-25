@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { useSleep } from "../../hooks/useSleep";
 
 const navItems = [
   { path: "/", label: "Home", icon: "⌂", end: true },
@@ -9,6 +10,7 @@ const navItems = [
 ];
 
 export default function BottomNav() {
+  const { sleepState } = useSleep();
   return (
     <nav className="bottom-nav" aria-label="Mobile navigation">
       {navItems.map((item) => (
@@ -20,7 +22,12 @@ export default function BottomNav() {
             isActive ? "bottom-nav-item active" : "bottom-nav-item"
           }
         >
-          <span className="bottom-nav-icon">{item.icon}</span>
+          <span className="bottom-nav-icon" style={{ position: "relative" }}>
+            {item.icon}
+            {item.path === "/log" && sleepState === "SLEEPING" && (
+              <span className="log-pulse-dot-bottom" />
+            )}
+          </span>
           <span className="bottom-nav-label">{item.label}</span>
         </NavLink>
       ))}

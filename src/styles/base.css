@@ -95,6 +95,10 @@
   --glow-accent: 0 0 32px rgba(124,106,255,0.12);
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 html, body, #root {
   height: 100%;
 }

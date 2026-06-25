@@ -19,7 +19,8 @@ export const profileApi = {
 
   updateProfile: async (token, data) => {
     if (isDummyToken(token)) {
-      return { user: { ...DUMMY_USER, ...data } };
+      Object.assign(DUMMY_USER, data);
+      return { user: DUMMY_USER };
     }
 
     const res = await axios.put(`${BASE}/profile/update`, data, {

@@ -24,15 +24,29 @@
 }
 
 .navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: auto;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.navbar-logo-mark {
+  flex-shrink: 0;
+  display: block;
+}
+
+.navbar-wordmark {
   font-size: 17px;
   font-weight: 800;
   letter-spacing: -0.03em;
-  margin-right: auto;
-  background: linear-gradient(135deg, var(--accent), var(--green));
+  background: linear-gradient(135deg, #7F77DD, #1D9E75);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
 
 .navbar-links {
   display: flex;
@@ -310,4 +324,47 @@
   .desktop-only { display: flex !important; }
   .bottom-nav { display: none !important; }
   .mobile-menu { display: none !important; }
+}
+
+/* Pulsing red dots for active sleep session */
+.nav-link {
+  position: relative;
+}
+.mobile-nav-link {
+  position: relative;
+}
+.log-pulse-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  position: absolute;
+  top: 6px;
+  right: 1px;
+  animation: logPulse 1.5s infinite;
+}
+.log-pulse-dot-bottom {
+  width: 6px;
+  height: 6px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  position: absolute;
+  top: -1px;
+  right: -3px;
+  animation: logPulse 1.5s infinite;
+}
+
+@keyframes logPulse {
+  0% {
+    transform: scale(0.8);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 5px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(0.8);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
 }

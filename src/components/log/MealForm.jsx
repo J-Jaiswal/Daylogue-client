@@ -2,12 +2,12 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 const FOOD_CATEGORIES = [
-  { value: "breakfast",  label: "Breakfast",  icon: "🌅" },
-  { value: "lunch",      label: "Lunch",      icon: "☀️" },
-  { value: "dinner",     label: "Dinner",     icon: "🌆" },
+  { value: "breakfast",  label: "Breakfast",  icon: "🍳" },
+  { value: "lunch",      label: "Lunch",      icon: "🍛" },
+  { value: "dinner",     label: "Dinner",     icon: "🍽️" },
   { value: "snacks",     label: "Snacks",     icon: "🍎" },
-  { value: "junk_food",  label: "Junk Food",  icon: "🍔" },
-  { value: "cheat_meal", label: "Cheat Meal", icon: "🍕" },
+  { value: "junk_food",  label: "Junk food",  icon: "🍔" },
+  { value: "cheat_meal", label: "Cheat meal", icon: "🍕" },
 ];
 
 const DRINK_CATEGORIES = [
@@ -15,7 +15,7 @@ const DRINK_CATEGORIES = [
   { value: "coffee",        label: "Coffee",        icon: "☕" },
   { value: "tea",           label: "Tea",           icon: "🍵" },
   { value: "juice",         label: "Juice",         icon: "🥤" },
-  { value: "protein_shake", label: "Protein Shake", icon: "🧃" },
+  { value: "protein_shake", label: "Protein shake", icon: "🧃" },
   { value: "alcohol",       label: "Alcohol",       icon: "🍺" },
   { value: "soda",          label: "Soda",          icon: "🥃" },
 ];
@@ -33,7 +33,12 @@ export default function MealForm({ meals, onSave, isPending }) {
   const [items, setItems]       = useState([emptyItem()]);
 
   const isDrink = catGroup === "drinks";
-  const meta    = catMeta(category);
+
+  // Reactive apply button label — updates every render based on current `category`
+  const activeMeta = category ? catMeta(category) : null;
+  const applyButtonLabel = activeMeta
+    ? `Apply ${activeMeta.label.toLowerCase()}`
+    : "Apply entry";
 
   const handleGroupToggle = (group) => {
     setCatGroup(group);
@@ -51,8 +56,8 @@ export default function MealForm({ meals, onSave, isPending }) {
 
   const handleSave = () => {
     const valid = items.every((i) => {
-      if (!i.amount.trim()) return false;         // amount always required
-      if (!isDrink && !i.name.trim()) return false; // name required for food
+      if (!i.amount.trim()) return false;
+      if (!isDrink && !i.name.trim()) return false;
       return true;
     });
     if (!valid) {
@@ -60,6 +65,7 @@ export default function MealForm({ meals, onSave, isPending }) {
       return;
     }
 
+    const meta = catMeta(category);
     const meal = {
       category,
       items: items.map((i) => ({
@@ -68,169 +74,183 @@ export default function MealForm({ meals, onSave, isPending }) {
       })),
     };
 
+    // Immediately update local state via onSave — removes tag from list too
     onSave([...(meals || []), meal]);
     setItems([emptyItem()]);
     toast.success(`${meta.label} saved`);
   };
 
+  // Remove a logged meal entry from local state immediately
   const removeMeal = (idx) => {
-    onSave((meals || []).filter((_, i) => i !== idx));
+    const updated = (meals || []).filter((_, i) => i !== idx);
+    onSave(updated);
+  };
+
+  const handleCancel = () => {
+    setItems([emptyItem()]);
+    setCategory(catGroup === "food" ? "breakfast" : "water");
   };
 
   return (
-    <div className="meal-form-wrap">
-      <h3 className="form-card-title">Nutrition & Hydration</h3>
-
-      {/* Removable chips at the top */}
-      {meals?.length > 0 && (
-        <div className="saved-chips-container">
-          <h4 className="saved-title-label">LOGGED TODAY</h4>
-          <div className="saved-chips-list">
-            {meals.map((m, idx) => {
-              const mc = catMeta(m.category);
-              const itemsStr = m.items.map((it) => {
-                const isPlaceholder = it.name.toLowerCase() === mc.label.toLowerCase();
+    <div className="meal-form-container">
+      {/* Section 1 — Logged today list */}
+      <div className="section-label">LOGGED TODAY</div>
+      {!meals || meals.length === 0 ? (
+        <div style={{ color: "var(--text-3)", fontSize: "13.5px", fontStyle: "italic", padding: "4px 0 16px" }}>
+          No meals logged yet today.
+        </div>
+      ) : (
+        <div style={{ marginBottom: "16px" }}>
+          {meals.map((m, idx) => {
+            const mc = catMeta(m.category);
+            const itemsStr = m.items
+              .map((it) => {
+                const isPlaceholder =
+                  it.name.toLowerCase() === mc.label.toLowerCase();
                 return isPlaceholder ? it.amount : `${it.name} (${it.amount})`;
-              }).join(", ");
-              return (
-                <div key={idx} className="meal-saved-chip">
-                  <span className="chip-icon">{mc.icon}</span>
-                  <span className="chip-text">
-                    <strong>{mc.label}</strong> · {itemsStr}
-                  </span>
-                  <button
-                    type="button"
-                    className="chip-remove-btn"
-                    onClick={() => removeMeal(idx)}
-                    title="Remove entry"
-                  >✕</button>
+              })
+              .join(", ");
+            return (
+              <div key={idx} className="log-entry">
+                <div className="log-entry-left">
+                  <span className="log-entry-icon">{mc.icon}</span>
+                  <div>
+                    <div className="log-entry-name">{mc.label}</div>
+                    <div className="log-entry-meta">{itemsStr}</div>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
+                <button
+                  type="button"
+                  className="rm-btn"
+                  onClick={() => removeMeal(idx)}
+                  title="Remove entry"
+                >
+                  ×
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
 
-      {/* Tappable Segmented Controller for Food vs Drinks */}
-      <div className="meal-group-segmented">
-        <button
-          type="button"
-          className={`segment-btn ${catGroup === "food" ? "active" : ""}`}
-          onClick={() => handleGroupToggle("food")}
-        >
-          🥗 Food
-        </button>
-        <button
-          type="button"
-          className={`segment-btn ${catGroup === "drinks" ? "active" : ""}`}
-          onClick={() => handleGroupToggle("drinks")}
-        >
-          💧 Drinks
-        </button>
-      </div>
+      {/* Section 2 — Add entry */}
+      <div className="input-zone" style={{ "--zc": "#1D9E75" }}>
+        <div className="zone-header">
+          <span className="zone-label-text">ADD ENTRY</span>
+        </div>
 
-      {/* Icon Tab Row (Always visible tabs) */}
-      <div className="category-tabs-row">
-        {catGroup === "food" ? (
-          FOOD_CATEGORIES.map((c) => (
-            <button
-              key={c.value}
-              type="button"
-              className={`category-tab-btn ${category === c.value ? "active" : ""}`}
-              onClick={() => setCategory(c.value)}
-            >
-              <span className="tab-icon">{c.icon}</span>
-              <span className="tab-label">{c.label}</span>
-            </button>
-          ))
-        ) : (
-          DRINK_CATEGORIES.map((c) => (
-            <button
-              key={c.value}
-              type="button"
-              className={`category-tab-btn ${category === c.value ? "active" : ""}`}
-              onClick={() => setCategory(c.value)}
-            >
-              <span className="tab-icon">{c.icon}</span>
-              <span className="tab-label">{c.label}</span>
-            </button>
-          ))
-        )}
-      </div>
+        {/* Food / Drinks toggle sub-tabs */}
+        <div className="food-sub-tabs">
+          <button
+            type="button"
+            className={`food-sub-tab ${catGroup === "food" ? "active" : ""}`}
+            onClick={() => handleGroupToggle("food")}
+          >
+            🍱 Food
+          </button>
+          <button
+            type="button"
+            className={`food-sub-tab ${catGroup === "drinks" ? "active" : ""}`}
+            onClick={() => handleGroupToggle("drinks")}
+          >
+            💧 Drinks
+          </button>
+        </div>
 
-      {/* Input Rows */}
-      <div className="meal-inputs-container">
-        <h4 className="section-label-header">
-          {isDrink ? "DRINK QUANTITIES" : "FOOD ITEMS"}
-        </h4>
-        
-        <div className="meal-items-list">
+        {/* Category chips selector */}
+        <div className="meal-chips">
+          {catGroup === "food"
+            ? FOOD_CATEGORIES.map((c) => (
+                <button
+                  key={c.value}
+                  type="button"
+                  className={`meal-chip ${category === c.value ? "sel" : ""}`}
+                  onClick={() => setCategory(c.value)}
+                >
+                  {c.icon} {c.label}
+                </button>
+              ))
+            : DRINK_CATEGORIES.map((c) => (
+                <button
+                  key={c.value}
+                  type="button"
+                  className={`meal-chip ${category === c.value ? "sel" : ""}`}
+                  onClick={() => setCategory(c.value)}
+                >
+                  {c.icon} {c.label}
+                </button>
+              ))}
+        </div>
+
+        {/* Food Items list headers */}
+        <div className="food-items-header">
+          <span className="food-items-label">
+            {isDrink ? "DRINK ITEMS" : "FOOD ITEMS"}
+          </span>
+          <button
+            type="button"
+            className="btn-ghost"
+            style={{ "--zc": "#1D9E75" }}
+            onClick={addItem}
+          >
+            + Add item
+          </button>
+        </div>
+
+        {/* Food item rows */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginBottom: "8px" }}>
           {items.map((item) => (
-            <div key={item.id} className="meal-input-row">
-              {/* Item Name */}
-              <div className="input-col col-main">
-                <span className="mobile-field-label">
-                  {isDrink ? "BRAND / TYPE (OPTIONAL)" : "ITEM NAME"}
-                </span>
+            <div key={item.id} className="food-item-row">
+              <div className="field-wrap" style={{ flex: 2 }}>
                 <input
                   type="text"
-                  className="styled-table-input"
-                  placeholder={isDrink ? "e.g. Evian (optional)" : "e.g. Chicken breast"}
+                  placeholder={
+                    isDrink ? "e.g. Water, Evian (optional)" : "e.g. Chicken breast"
+                  }
                   value={item.name}
                   onChange={(e) => updateItem(item.id, "name", e.target.value)}
                 />
               </div>
-
-              {/* Amount / Quantity */}
-              <div className="input-col col-amount">
-                <span className="mobile-field-label">
-                  {isDrink ? "QUANTITY" : "AMOUNT"}
-                </span>
+              <div className="field-wrap" style={{ flex: 1 }}>
                 <input
                   type="text"
-                  className="styled-table-input"
                   placeholder={isDrink ? "e.g. 500ml" : "e.g. 300g"}
                   value={item.amount}
                   onChange={(e) => updateItem(item.id, "amount", e.target.value)}
                 />
               </div>
-
-              {/* Delete row button */}
-              <div className="input-col col-action">
-                <button
-                  type="button"
-                  className="row-delete-btn"
-                  onClick={() => removeItem(item.id)}
-                  disabled={items.length === 1}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </button>
-              </div>
+              <button
+                type="button"
+                className="rm-btn"
+                style={{ paddingBottom: "8px" }}
+                onClick={() => removeItem(item.id)}
+                disabled={items.length === 1}
+              >
+                ×
+              </button>
             </div>
           ))}
         </div>
-      </div>
 
-      {/* Action buttons */}
-      <div className="meal-form-actions">
-        <button
-          type="button"
-          className="dashed-ghost-add-btn"
-          onClick={addItem}
-        >
-          + {isDrink ? "Add Cup / serving" : "Add Item"}
-        </button>
-        <button
-          type="button"
-          className="solid-purple-save-btn"
-          onClick={handleSave}
-          disabled={isPending}
-        >
-          Apply {meta.label}
-        </button>
+        {/* Action Row */}
+        <div className="action-row">
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={handleCancel}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="btn-primary"
+            style={{ "--zc": "#1D9E75", background: "#1D9E75", color: "#fff" }}
+            onClick={handleSave}
+            disabled={isPending}
+          >
+            Save
+          </button>
+        </div>
       </div>
     </div>
   );

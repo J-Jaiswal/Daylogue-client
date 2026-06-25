@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import { useSleep } from "../../hooks/useSleep";
 import BottomNav from "./BottomNav";
 
 const navItems = [
@@ -14,7 +15,8 @@ const navItems = [
 ];
 
 export default function Navbar() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+  const { sleepState } = useSleep();
   const navigate = useNavigate();
 
   const [isLight, setIsLight] = useState(() => {
@@ -44,7 +46,29 @@ export default function Navbar() {
   return (
     <>
       <nav className="navbar">
-        <div className="navbar-brand">Daylogue</div>
+        <div className="navbar-brand">
+          {/* Logomark: two arcs forming a D loop — sleep/wake cycle metaphor */}
+          <svg className="navbar-logo-mark" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            {/* Outer arc — wakefulness */}
+            <path d="M12 2 A10 10 0 0 1 22 12" stroke="url(#logo-grad-1)" strokeWidth="2.5" strokeLinecap="round"/>
+            {/* Inner arc — sleep */}
+            <path d="M12 22 A10 10 0 0 1 2 12" stroke="url(#logo-grad-2)" strokeWidth="2.5" strokeLinecap="round"/>
+            {/* Centre dot — today */}
+            <circle cx="12" cy="12" r="2.5" fill="url(#logo-grad-1)"/>
+            <defs>
+              <linearGradient id="logo-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#7F77DD"/>
+                <stop offset="100%" stopColor="#9F99F0"/>
+              </linearGradient>
+              <linearGradient id="logo-grad-2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#1D9E75"/>
+                <stop offset="100%" stopColor="#7F77DD"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <span className="navbar-wordmark">Daylogue</span>
+        </div>
+
 
         {/* Desktop nav links */}
         <div className="navbar-links desktop-only">
@@ -58,6 +82,9 @@ export default function Navbar() {
               }
             >
               {item.label}
+              {item.path === "/log" && sleepState === "SLEEPING" && (
+                <span className="log-pulse-dot" />
+              )}
             </NavLink>
           ))}
         </div>
@@ -103,6 +130,9 @@ export default function Navbar() {
               }
             >
               {item.label}
+              {item.path === "/log" && sleepState === "SLEEPING" && (
+                <span className="log-pulse-dot" />
+              )}
             </NavLink>
           ))}
           <button className="mobile-logout-btn" onClick={handleLogout}>
