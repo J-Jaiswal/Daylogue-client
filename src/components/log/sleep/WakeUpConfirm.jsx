@@ -46,7 +46,13 @@ export default function WakeUpConfirm({ activeSession, confirmWakeUp, onNotYet }
   const durationMinutes = Math.max(0, Math.floor(diffMs / 60000));
 
   const handleConfirm = () => {
-    confirmWakeUp(new Date().toISOString());
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const wokeUpDate = `${year}-${month}-${day}`;
+
+    confirmWakeUp(now.toISOString(), wokeUpDate);
   };
 
   return (
@@ -61,11 +67,10 @@ export default function WakeUpConfirm({ activeSession, confirmWakeUp, onNotYet }
         {formatTimeAMPM(activeSession.fellAsleepTime)} ({formatDateShort(activeSession.fellAsleepDate)}) →{" "}
         {formatTimeAMPM(currentTime.toISOString())} (Today)
       </p>
-      <div style={{ display: "flex", gap: "10px", marginTop: "4px" }}>
+      <div className="sleep-action-row" style={{ marginTop: "4px" }}>
         <button
           type="button"
           className="pill-button primary-pill"
-          style={{ width: "auto" }}
           onClick={handleConfirm}
         >
           Yes, I'm up
@@ -73,7 +78,6 @@ export default function WakeUpConfirm({ activeSession, confirmWakeUp, onNotYet }
         <button
           type="button"
           className="pill-button ghost-pill"
-          style={{ width: "auto" }}
           onClick={onNotYet}
         >
           Not yet

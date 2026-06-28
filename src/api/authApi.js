@@ -14,13 +14,14 @@ export const authApi = {
     return res.data;
   },
 
-  getMe: async (token) => {
+  getMe: async (token, signal) => {
     if (isDummyToken(token)) {
       return { user: DUMMY_USER };
     }
 
     const res = await axios.get(`${BASE}/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
+      signal,
     });
     return res.data;
   },

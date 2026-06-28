@@ -63,13 +63,18 @@ export default function SleepRecording({ activeSession, cancelSleep, onWakeUp })
 
   return (
     <div className="sleep-card-flat">
+      {/* Stopwatch row */}
       <div className="sleep-timer-container">
         <span className="sleep-rec-dot" />
         <span className="sleep-timer-title">{elapsedText}</span>
-        <span className="sleep-timer-label">REC</span>
+        <span className="sleep-timer-badge">
+          🔴 REC
+        </span>
       </div>
-      <div>
-        <span className="sleep-timer-label" style={{ display: "block", fontWeight: 600 }}>
+
+      {/* Sleeping-since text */}
+      <div className="sleep-since-row">
+        <span className="sleep-since-label">
           Sleeping since {formatTimeAMPM(activeSession?.fellAsleepTime)}
         </span>
         {crossesMidnight && (
@@ -78,11 +83,12 @@ export default function SleepRecording({ activeSession, cancelSleep, onWakeUp })
           </span>
         )}
       </div>
-      <div style={{ display: "flex", gap: "10px" }}>
+
+      {/* Action buttons */}
+      <div className="sleep-action-row">
         <button
           type="button"
           className="pill-button primary-pill"
-          style={{ width: "auto" }}
           onClick={onWakeUp}
         >
           ☀️ Wake Up
@@ -90,7 +96,6 @@ export default function SleepRecording({ activeSession, cancelSleep, onWakeUp })
         <button
           type="button"
           className="pill-button ghost-pill"
-          style={{ width: "auto" }}
           onClick={() => setShowCancelModal(true)}
         >
           ✕ Cancel

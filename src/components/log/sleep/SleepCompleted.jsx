@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 // Formatting utilities
 const formatTimeAMPM = (timeStr) => {
@@ -30,8 +30,15 @@ const formatDurationHM = (totalMinutes) => {
   return m > 0 ? `${h}h ${m}m` : `${h}h`;
 };
 
-export default function SleepCompleted({ sleepEntry }) {
+export default function SleepCompleted({ sleepEntry, deleteSleep }) {
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
   if (!sleepEntry) return null;
+
+  const handleDelete = () => {
+    deleteSleep();
+    setShowConfirmModal(false);
+  };
 
   return (
     <>
@@ -43,13 +50,53 @@ export default function SleepCompleted({ sleepEntry }) {
             <div className="log-entry-name">Sleep session</div>
             <div className="log-entry-meta">
               {formatTimeAMPM(sleepEntry.fellAsleepTime)} – {formatTimeAMPM(sleepEntry.wokeUpTime)}
-              {sleepEntry.crossesMidnight && ` (${formatDateShort(sleepEntry.fellAsleepDate)} – ${formatDateShort(sleepEntry.wokeUpDate)})`}
+              {sleepEntry.crossesMidnight 
+                ? ` (${formatDateShort(sleepEntry.fellAsleepDate)} – ${formatDateShort(sleepEntry.wokeUpDate)})` 
+                : ` (${formatDateShort(sleepEntry.wokeUpDate)})`
+              }
               {" · "}
               {formatDurationHM(sleepEntry.duration)}
             </div>
           </div>
         </div>
+        <button
+          type="button"
+          className="rm-btn"
+          onClick={() => setShowConfirmModal(true)}
+          title="Delete sleep log"
+        >
+          ×
+        </button>
       </div>
+
+      {showConfirmModal && (
+        <div className="sleep-modal-backdrop">
+          <div className="sleep-modal-content">
+            <h3 className="sleep-modal-title">Delete sleep entry?</h3>
+            <p className="sleep-modal-text">
+              Are you sure you want to delete your drafted sleep session? This will remove it from your drafts and cannot be undone.
+            </p>
+            <div className="sleep-modal-actions">
+              <button
+                type="button"
+                className="pill-button primary-pill"
+                style={{ background: "#ef4444", width: "auto" }}
+                onClick={handleDelete}
+              >
+                Yes, delete
+              </button>
+              <button
+                type="button"
+                className="pill-button ghost-pill"
+                style={{ width: "auto" }}
+                onClick={() => setShowConfirmModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

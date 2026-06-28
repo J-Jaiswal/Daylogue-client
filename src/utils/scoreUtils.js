@@ -15,8 +15,8 @@ export const calculateDailyScore = (log) => {
   let score = 0;
 
   // ── Sleep (0–35) ──────────────────────────────────
-  if (log.sleep?.bedTime) {
-    const mins = log.sleep.durationMinutes || 0;
+  if (log.sleep?.fellAsleepTime) {
+    const mins = log.sleep.duration || 0;
     if (mins >= 420 && mins <= 540) score += 35; // 7–9 h ideal
     else if (mins >= 360)            score += 22; // 6–7 h decent
     else if (mins > 0)               score += 10; // <6 h or >9 h
@@ -44,7 +44,7 @@ export const calculateDailyScore = (log) => {
   }
 
   // ── Completeness bonus (0–10) ─────────────────────
-  const hasSleep   = !!log.sleep?.bedTime;
+  const hasSleep   = !!log.sleep?.fellAsleepTime;
   const hasWorkout = (log.workouts?.length ?? 0) > 0;
   const hasMeals   = (log.meals?.length ?? 0) > 0;
   const logged     = [hasSleep, hasWorkout, hasMeals].filter(Boolean).length;
@@ -60,9 +60,11 @@ export const calculateDailyScore = (log) => {
  * Returns a display label and CSS colour token for a given score.
  */
 export const getScoreLabel = (score) => {
-  if (score >= 85) return { label: "Outstanding", color: "var(--green)" };
-  if (score >= 70) return { label: "Strong",      color: "#34d399" };
-  if (score >= 55) return { label: "Decent",      color: "var(--amber)" };
-  if (score >= 40) return { label: "Below Par",   color: "#fb923c" };
-  return                  { label: "Needs Work",  color: "var(--red)" };
+  if (score === null || score === undefined) {
+    return { label: "Not scored", color: "var(--text-3)" };
+  }
+  if (score >= 90) return { label: "Great day", color: "#0F6E56" };
+  if (score >= 75) return { label: "On track", color: "#0F6E56" };
+  if (score >= 50) return { label: "Getting there", color: "#BA7517" };
+  return { label: "Not Okay", color: "#BA7517" };
 };

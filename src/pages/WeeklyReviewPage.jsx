@@ -1,10 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
+import { useWeeklyReview } from "../hooks/useWeeklyReview";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../hooks/useAuth";
 import { aiApi } from "../api/aiApi";
 import WeeklyReviewCard from "../components/weekly/WeeklyReviewCard";
+import toast from "react-hot-toast";
 
 export default function WeeklyReviewPage() {
   const { token } = useAuth();
+  const queryClient = useQueryClient();
 
   const {
     data: review,
@@ -12,12 +15,18 @@ export default function WeeklyReviewPage() {
     isError,
     refetch,
     isFetching,
-  } = useQuery({
-    queryKey: ["weekly-review"],
-    queryFn: () => aiApi.getWeeklyReview(token),
-    select: (data) => data.review,
-    staleTime: 1000 * 60 * 60,
-  });
+  } = useWeeklyReview();
+
+  const handleRegenerate = async () => {
+    try {
+      await aiApi.deleteWeeklyCache(token);
+      await queryClient.invalidateQueries({ queryKey: ["weekly-review"] });
+      refetch();
+      toast.success("Regenerating weekly review...");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to regenerate review");
+    }
+  };
 
   return (
     <div className="page weekly-page">
@@ -46,7 +55,7 @@ export default function WeeklyReviewPage() {
           <WeeklyReviewCard review={review} />
           <button
             className="btn-secondary weekly-regenerate-btn"
-            onClick={() => refetch()}
+            onClick={handleRegenerate}
             disabled={isFetching}
           >
             ↻ Regenerate Review

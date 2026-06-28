@@ -10,23 +10,38 @@ const SUGGESTED_QUESTIONS = [
   "What pattern stands out from my recent logs?",
 ];
 
-function MessageBubble({ message }) {
+function MessageBubble({ message, isFirstInGroup }) {
   const isUser = message.role === "user";
-  return (
-    <div className={`coach-msg ${isUser ? "coach-msg--user" : "coach-msg--ai"}`}>
-      {!isUser && (
-        <div className="coach-ai-avatar">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
-            <circle cx="9" cy="13" r="1"/>
-            <circle cx="15" cy="13" r="1"/>
-          </svg>
+  const paragraphs = !isUser
+    ? message.content.split(/\n+/).map((p) => p.trim()).filter(Boolean)
+    : null;
+
+  if (isUser) {
+    return (
+      <div className="coach-msg coach-msg--user">
+        <div className="coach-bubble">
+          {message.content.split("\n").map((line, i) =>
+            line.trim() ? <p key={i}>{line}</p> : null
+          )}
         </div>
-      )}
-      <div className="coach-bubble">
-        {message.content
-          .split("\n")
-          .map((line, i) => (line.trim() ? <p key={i}>{line}</p> : null))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="coach-msg coach-msg--ai">
+      <div className="coach-ai-bubbles-stack">
+        {isFirstInGroup && (
+          <div className="coach-ai-sender-label">
+            <span className="coach-ai-sender-dot" />
+            Daylogue
+          </div>
+        )}
+        {paragraphs.map((p, idx) => (
+          <div key={idx} className="coach-bubble">
+            <p>{p}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -72,17 +87,23 @@ export default function ChatPage() {
       {/* Header */}
       <div className="coach-header">
         <div className="coach-header-left">
-          <h1 className="coach-title">AI Coach</h1>
-          <p className="coach-subtitle">Context from your last 14 days of logs</p>
+          <div className="coach-ai-badge">✦</div>
+          <div className="coach-header-text">
+            <h1 className="coach-title">AI Coach</h1>
+            <p className="coach-subtitle">Personalized to you</p>
+          </div>
         </div>
-        {hasMessages && (
-          <button className="coach-clear-btn" onClick={clearChat}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-            </svg>
-            Clear
-          </button>
-        )}
+        <button
+          className="coach-clear-btn-square"
+          onClick={clearChat}
+          disabled={!hasMessages}
+          aria-label="Clear chat"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          </svg>
+        </button>
       </div>
 
       <div className="coach-tab-divider" />
@@ -92,11 +113,7 @@ export default function ChatPage() {
         {!hasMessages && (
           <div className="coach-empty">
             <div className="coach-empty-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
-                <circle cx="9" cy="13" r="1"/>
-                <circle cx="15" cy="13" r="1"/>
-              </svg>
+              <span>✨</span>
             </div>
             <p className="coach-empty-greeting">
               Hey {user?.name?.split(" ")[0] || "there"} — ask me anything.
@@ -124,19 +141,15 @@ export default function ChatPage() {
           </div>
         )}
 
-        {messages.map((msg, i) => (
-          <MessageBubble key={i} message={msg} />
-        ))}
+        {messages.map((msg, i) => {
+          const isFirstInGroup =
+            msg.role === "assistant" &&
+            (i === 0 || messages[i - 1].role !== "assistant");
+          return <MessageBubble key={i} message={msg} isFirstInGroup={isFirstInGroup} />;
+        })}
 
         {loading && (
           <div className="coach-msg coach-msg--ai">
-            <div className="coach-ai-avatar">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
-                <circle cx="9" cy="13" r="1"/>
-                <circle cx="15" cy="13" r="1"/>
-              </svg>
-            </div>
             <div className="coach-bubble coach-typing">
               <span /><span /><span />
             </div>
@@ -148,26 +161,28 @@ export default function ChatPage() {
 
       {/* Input bar */}
       <div className="coach-input-wrap">
-        <div className="coach-input-bar">
-          <textarea
-            ref={textareaRef}
-            className="coach-input"
-            rows={1}
-            placeholder="Ask your coach…"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={loading}
-          />
+        <div className="coach-input-wrap-row">
+          <div className="coach-input-bar-pill">
+            <textarea
+              ref={textareaRef}
+              className="coach-input"
+              rows={1}
+              placeholder="Ask your coach..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={loading}
+            />
+          </div>
           <button
-            className="coach-send-btn"
+            className="coach-send-btn-square"
             onClick={handleSend}
             disabled={!input.trim() || loading}
             aria-label="Send message"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="19" x2="12" y2="5"/>
-              <polyline points="5 12 12 5 19 12"/>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="19" x2="12" y2="5" />
+              <polyline points="5 12 12 5 19 12" />
             </svg>
           </button>
         </div>

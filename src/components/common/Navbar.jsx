@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useSleep } from "../../hooks/useSleep";
 import BottomNav from "./BottomNav";
@@ -16,8 +16,22 @@ const navItems = [
 
 export default function Navbar() {
   const { logout, user } = useAuth();
-  const { sleepState } = useSleep();
+  const { sleepState, loading: sleepLoading } = useSleep();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Derived: is a sleep session actively recording?
+  const isSleepActive = sleepState === "SLEEPING" || sleepState === "STALE";
+
+  // Auto-redirect to /log (sleep tab) if a session is active when app opens
+  useEffect(() => {
+    if (sleepLoading) return; // wait until sleep state is resolved
+    if (isSleepActive && location.pathname !== "/log") {
+      navigate("/log", { state: { tab: "sleep" }, replace: false });
+    }
+  // Only run once on mount after sleepLoading resolves
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sleepLoading]);
 
   const [isLight, setIsLight] = useState(() => {
     return localStorage.getItem("daylogue-theme") === "light";
@@ -82,7 +96,7 @@ export default function Navbar() {
               }
             >
               {item.label}
-              {item.path === "/log" && sleepState === "SLEEPING" && (
+              {item.path === "/log" && isSleepActive && (
                 <span className="log-pulse-dot" />
               )}
             </NavLink>
@@ -130,7 +144,7 @@ export default function Navbar() {
               }
             >
               {item.label}
-              {item.path === "/log" && sleepState === "SLEEPING" && (
+              {item.path === "/log" && isSleepActive && (
                 <span className="log-pulse-dot" />
               )}
             </NavLink>

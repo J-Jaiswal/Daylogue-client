@@ -11,6 +11,7 @@ const navItems = [
 
 export default function BottomNav() {
   const { sleepState } = useSleep();
+  const isSleepActive = sleepState === "SLEEPING" || sleepState === "STALE";
   return (
     <nav className="bottom-nav" aria-label="Mobile navigation">
       {navItems.map((item) => (
@@ -24,7 +25,7 @@ export default function BottomNav() {
         >
           <span className="bottom-nav-icon" style={{ position: "relative" }}>
             {item.icon}
-            {item.path === "/log" && sleepState === "SLEEPING" && (
+            {item.path === "/log" && isSleepActive && (
               <span className="log-pulse-dot-bottom" />
             )}
           </span>

@@ -7,7 +7,10 @@ import SleepCompleted from "./SleepCompleted";
 import StaleSessionRecovery from "./StaleSessionRecovery";
 import NapSection from "./NapSection";
 
-export default function SleepSection() {
+export default function SleepSection({ sleepHelper }) {
+  const localSleep = useSleep();
+  const helper = sleepHelper || localSleep;
+
   const {
     sleepState,
     setSleepState,
@@ -19,8 +22,9 @@ export default function SleepSection() {
     naps,
     addNap,
     deleteNap,
+    deleteSleep,
     loading,
-  } = useSleep();
+  } = helper;
 
   if (loading) {
     return (
@@ -51,7 +55,7 @@ export default function SleepSection() {
         />
       )}
       {sleepState === "COMPLETED" && (
-        <SleepCompleted sleepEntry={sleepEntry} />
+        <SleepCompleted sleepEntry={sleepEntry} deleteSleep={deleteSleep} />
       )}
       {sleepState === "STALE" && (
         <StaleSessionRecovery

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { authApi } from "../api/authApi";
 import { AuthContext } from "./auth-context";
 import { DUMMY_TOKEN, DUMMY_USER } from "../utils/authBypass";
@@ -26,6 +27,7 @@ export const AuthProvider = ({ children }) => {
 
   // on mount, fetch current user if token exists
   useEffect(() => {
+    const controller = new AbortController();
     const bootstrap = async () => {
       if (token) {
         if (token === DUMMY_TOKEN) {
@@ -35,9 +37,12 @@ export const AuthProvider = ({ children }) => {
         }
 
         try {
-          const data = await authApi.getMe(token);
+          const data = await authApi.getMe(token, controller.signal);
           setUser(data.user);
-        } catch {
+        } catch (err) {
+          if (err.name === "CanceledError" || axios.isCancel?.(err)) {
+            return;
+          }
           // token invalid or expired
           logout();
         }
@@ -45,6 +50,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     };
     bootstrap();
+    return () => controller.abort();
   }, [token]);
 
   return (

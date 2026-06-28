@@ -47,7 +47,12 @@ export default function StaleSessionRecovery({ activeSession, confirmWakeUp, can
       wokeUpDateObj.setDate(wokeUpDateObj.getDate() + 1);
     }
 
-    confirmWakeUp(wokeUpDateObj.toISOString());
+    const year = wokeUpDateObj.getFullYear();
+    const month = String(wokeUpDateObj.getMonth() + 1).padStart(2, "0");
+    const day = String(wokeUpDateObj.getDate()).padStart(2, "0");
+    const wokeUpDate = `${year}-${month}-${day}`;
+
+    confirmWakeUp(wokeUpDateObj.toISOString(), wokeUpDate);
   };
 
   return (

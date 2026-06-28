@@ -24,10 +24,10 @@ export const sleepApi = {
     const res = await axios.post(`${BASE}/sleep/start`, {}, {
       headers: authHeader(token),
     });
-    return res.data;
+    return res.data.session;
   },
 
-  completeSleep: async (token, wokeUpTime) => {
+  completeSleep: async (token, wokeUpTime, wokeUpDate) => {
     if (isDummyToken(token)) {
       const active = DUMMY_USER.activeSleepSession;
       if (!active) throw new Error("No active sleep session");
@@ -35,23 +35,16 @@ export const sleepApi = {
       const fell = new Date(active.fellAsleepTime);
       const woke = new Date(wokeUpTime);
       const duration = Math.round((woke - fell) / 60000);
-      const wokeUpDate = wokeUpTime.split("T")[0];
+      const finalWokeUpDate = wokeUpDate || wokeUpTime.split("T")[0];
 
       const sleepData = {
         fellAsleepDate: active.fellAsleepDate,
         fellAsleepTime: active.fellAsleepTime,
-        wokeUpDate,
+        wokeUpDate: finalWokeUpDate,
         wokeUpTime,
         duration,
-        crossesMidnight: active.fellAsleepDate !== wokeUpDate,
+        crossesMidnight: active.fellAsleepDate !== finalWokeUpDate,
       };
-
-      let log = DUMMY_LOGS.find((l) => l.date === wokeUpDate);
-      if (!log) {
-        log = { date: wokeUpDate, workouts: [], meals: [], naps: [] };
-        DUMMY_LOGS.push(log);
-      }
-      log.sleep = sleepData;
 
       DUMMY_USER.activeSleepSession = null;
       return sleepData;
@@ -59,10 +52,10 @@ export const sleepApi = {
 
     const res = await axios.post(
       `${BASE}/sleep/complete`,
-      { wokeUpTime },
+      { wokeUpTime, wokeUpDate },
       { headers: authHeader(token) }
     );
-    return res.data;
+    return res.data.sleep;
   },
 
   cancelSleep: async (token) => {

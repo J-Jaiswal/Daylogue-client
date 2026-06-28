@@ -76,6 +76,7 @@ export default function ProfilePage() {
     age: user?.age || "",
     weight: user?.weight || "",
     height: user?.height || "",
+    gender: user?.gender || "prefer_not_to_say",
     goals: user?.goals || "",
   });
 
@@ -108,6 +109,7 @@ export default function ProfilePage() {
         age: user.age || "",
         weight: user.weight || "",
         height: user.height || "",
+        gender: user.gender || "prefer_not_to_say",
         goals: user.goals || "",
       });
       setPhaseForm((prev) => ({
@@ -330,6 +332,12 @@ export default function ProfilePage() {
                     <span className="profile-stat-value">{user?.height || "—"}</span>
                     <span className="profile-stat-unit"> cm</span>
                   </div>
+                  <div className="profile-stat-item">
+                    <span className="profile-stat-value">
+                      {user?.gender ? (user.gender === "male" ? "M" : user.gender === "female" ? "F" : user.gender === "other" ? "O" : "—") : "—"}
+                    </span>
+                    <span className="profile-stat-unit"> gender</span>
+                  </div>
                 </div>
 
                 <div className="profile-divider" />
@@ -400,6 +408,35 @@ export default function ProfilePage() {
                         setProfileForm({ ...profileForm, height: e.target.value })
                       }
                     />
+                  </label>
+                </div>
+
+                <div className="profile-form-grid mt-16">
+                  <label className="cinematic-input-wrapper">
+                    <span className="profile-micro-label">GENDER</span>
+                    <select
+                      value={profileForm.gender}
+                      className="cinematic-text-input"
+                      onChange={(e) =>
+                        setProfileForm({ ...profileForm, gender: e.target.value })
+                      }
+                      style={{
+                        appearance: "none",
+                        width: "100%",
+                        background: "var(--bg-card)",
+                        border: "1px solid var(--border-strong)",
+                        borderRadius: "8px",
+                        color: "var(--text)",
+                        padding: "10px 14px",
+                        outline: "none",
+                        cursor: "pointer"
+                      }}
+                    >
+                      <option value="prefer_not_to_say">Prefer not to say</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                    </select>
                   </label>
                 </div>
 

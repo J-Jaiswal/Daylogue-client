@@ -1,0 +1,17 @@
+{
+  "name": "Daylogue",
+  "short_name": "Daylogue",
+  "description": "Health tracking for the life you are actually living.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d0d14",
+  "theme_color": "#7F77DD",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

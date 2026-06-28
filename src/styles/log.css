@@ -275,6 +275,24 @@
   opacity: 1;
 }
 
+/* Red pulsing REC badge on the Sleep tab during active session */
+.tab-sleep-rec {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: tabRecPulse 1.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes tabRecPulse {
+  0%, 100% { transform: scale(0.85); opacity: 0.7; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+  50%       { transform: scale(1.2);  opacity: 1;   box-shadow: 0 0 0 4px rgba(239, 68, 68, 0); }
+}
+
 /* ── Section Label ───────────────────────────────── */
 .section-label {
   font-size: 10px;
@@ -1170,24 +1188,41 @@
 
 /* Rec Card Area */
 .sleep-card-flat {
-  padding: 20px 0;
+  padding: 24px 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
   border-bottom: 0.5px solid var(--border-color);
 }
 
+/* Main stopwatch row */
 .sleep-timer-container {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .sleep-timer-title {
   font-family: monospace;
-  font-size: 26px;
+  font-size: 36px;
   font-weight: 700;
+  letter-spacing: 0.02em;
   color: var(--text);
+  line-height: 1;
+}
+
+.sleep-timer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #ef4444;
 }
 
 .sleep-timer-label {
@@ -1195,10 +1230,64 @@
   color: var(--text-2);
 }
 
+.sleep-since-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sleep-since-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
 .sleep-session-dates {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--text-3);
-  margin-top: -8px;
+}
+
+/* Action buttons row */
+.sleep-action-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sleep-action-row .pill-button {
+  flex: 0 1 auto;
+  width: 140px;
+  height: 40px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+}
+
+@media (max-width: 480px) {
+  .sleep-timer-title {
+    font-size: 44px;
+  }
+
+  .sleep-card-flat {
+    padding: 28px 0;
+    gap: 24px;
+  }
+
+  .sleep-action-row {
+    flex-direction: row;
+    display: flex;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .sleep-action-row .pill-button {
+    flex: 1;
+    min-width: 0;
+    width: 50%;
+    height: 46px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
 }
 
 /* Modal dialogue for cancel / confirmation */
@@ -2011,4 +2100,69 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Today's Uploaded Snapshot */
+.uploaded-snapshot-section {
+  margin-top: 32px;
+  background: var(--bg-card, #111118);
+  border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.05));
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+[data-theme="light"] .uploaded-snapshot-section {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.snapshot-header {
+  margin-bottom: 20px;
+}
+
+.snapshot-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.snapshot-title .badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1d9e75;
+  display: inline-block;
+}
+
+.snapshot-subtitle {
+  font-size: 12.5px;
+  color: var(--text-3);
+  margin: 6px 0 0;
+}
+
+.snapshot-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.snapshot-delete {
+  background: transparent;
+  color: var(--text-3);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.snapshot-delete:hover {
+  color: #ef4444;
+  transform: scale(1.15);
 }

@@ -168,16 +168,47 @@ export const DUMMY_LOGS = [
   },
   {
     date: "2026-06-14",
-    sleep: { bedTime: "22:40", wakeTime: "06:25", durationMinutes: 465 },
+    sleep: null,
     workouts: [],
-    meals: [
-      { category: "lunch", items: [{ name: "Dal, rice, vegetables", amount: "1 plate" }] },
-      { category: "snacks", items: [{ name: "Nuts", amount: "1 handful" }] },
-    ],
+    meals: [],
+    naps: [],
   },
 ];
 
 export const isDummyToken = (token) => token === DUMMY_TOKEN;
+
+// Post-process DUMMY_LOGS to align with server schema
+DUMMY_LOGS.forEach((log) => {
+  if (log.sleep && log.sleep.bedTime && log.sleep.wakeTime) {
+    const date = log.date;
+    const [bedH, bedM] = log.sleep.bedTime.split(":").map(Number);
+    const [wakeH, wakeM] = log.sleep.wakeTime.split(":").map(Number);
+    
+    const crossesMidnight = wakeH < bedH || (wakeH === bedH && wakeM < bedM);
+    
+    let wokeUpDateStr = date;
+    if (crossesMidnight) {
+      const d = new Date(date);
+      d.setDate(d.getDate() + 1);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      wokeUpDateStr = `${year}-${month}-${day}`;
+    }
+    
+    log.sleep = {
+      fellAsleepDate: date,
+      fellAsleepTime: `${date}T${log.sleep.bedTime}:00.000Z`,
+      wokeUpDate: wokeUpDateStr,
+      wokeUpTime: `${wokeUpDateStr}T${log.sleep.wakeTime}:00.000Z`,
+      duration: log.sleep.durationMinutes,
+      durationMinutes: log.sleep.durationMinutes, // compatibility
+      crossesMidnight,
+      bedTime: log.sleep.bedTime, // compatibility
+      wakeTime: log.sleep.wakeTime, // compatibility
+    };
+  }
+});
 
 export const todayIsoDate = () => "2026-06-14";
 
@@ -189,5 +220,5 @@ export const dummySummary = {
   totalWorkoutSessions: 6,
   junkFoodCount: 2,
   cheatMealCount: 2,
-  loggedDays: 14,
+  totalDays: 14,
 };

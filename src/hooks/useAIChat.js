@@ -15,10 +15,12 @@ export const useAIChat = () => {
     const text = content.trim();
     if (!text || loading) return;
 
-    const userMessage = { role: "user", content: text };
-    const conversationHistory = [...messages, userMessage];
+    const userMessage = { role: "user", content: text, _tempId: Date.now() };
+    // DO NOT include current userMessage in conversationHistory sent to server
+    // as the server builds the prompt with it appended separately.
+    const conversationHistory = [...messages]; 
 
-    setMessages(conversationHistory);
+    setMessages((current) => [...current, userMessage]);
     setLoading(true);
 
     try {
@@ -34,7 +36,7 @@ export const useAIChat = () => {
       ]);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to send message");
-      setMessages((current) => current.filter((msg) => msg !== userMessage));
+      setMessages((current) => current.filter((msg) => msg._tempId !== userMessage._tempId));
     } finally {
       setLoading(false);
     }

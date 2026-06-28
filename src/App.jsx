@@ -7,7 +7,7 @@ import HomePage from "./pages/HomePage";
 import DashboardPage from "./pages/DashboardPage";
 import LogPage from "./pages/LogPage";
 import HistoryPage from "./pages/HistoryPage";
-// import WeeklyReviewPage from "./pages/WeeklyReviewPage";
+import WeeklyReviewPage from "./pages/WeeklyReviewPage";
 import ChatPage from "./pages/ChatPage";
 import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
@@ -29,7 +29,7 @@ export default function App() {
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/log" element={<LogPage />} />
               <Route path="/history" element={<HistoryPage />} />
-              {/* <Route path="/weekly" element={<WeeklyReviewPage />} /> */}
+              <Route path="/weekly" element={<WeeklyReviewPage />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/profile" element={<ProfilePage />} />
             </Route>

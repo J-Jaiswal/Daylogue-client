@@ -65,4 +65,14 @@ export const aiApi = {
     );
     return res.data;
   },
+
+  deleteWeeklyCache: async (token) => {
+    if (isDummyToken(token)) {
+      return { success: true };
+    }
+    const res = await axios.delete(`${BASE}/ai/weekly`, {
+      headers: authHeader(token),
+    });
+    return res.data;
+  },
 };

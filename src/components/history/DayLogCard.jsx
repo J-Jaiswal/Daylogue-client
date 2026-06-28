@@ -52,6 +52,29 @@ const timeLabels = {
   late_night: "Late night",
 };
 
+const formatTimeAMPM = (timeStr) => {
+  if (!timeStr) return "";
+  const d = new Date(timeStr);
+  let h = d.getHours();
+  const m = d.getMinutes();
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12;
+  h = h ? h : 12;
+  const mStr = String(m).padStart(2, "0");
+  return `${h}:${mStr} ${ampm}`;
+};
+
+const formatDateShort = (dateStr) => {
+  if (!dateStr) return "";
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  if (dateStr.includes("T")) {
+    const d = new Date(dateStr);
+    return `${months[d.getMonth()]} ${d.getDate()}`;
+  }
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return `${months[m - 1]} ${d}`;
+};
+
 export default function DayLogCard({ date, log }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -83,10 +106,18 @@ export default function DayLogCard({ date, log }) {
           {/* Pill summary when collapsed */}
           {!expanded && hasLog && (
             <div className="day-log-mini-pillars">
-              {log.sleep?.bedTime   && <span className="mini-pillar sleep-p">🌙</span>}
-              {log.workouts?.length > 0 && <span className="mini-pillar workout-p">💪</span>}
-              {hasMeals             && <span className="mini-pillar meal-p">🥗</span>}
-              {hasDrinks            && <span className="mini-pillar drink-p">💧</span>}
+              {(log.sleep?.fellAsleepTime || (log.naps && log.naps.length > 0)) && (
+                <span className="mini-pillar-dot sleep-d" title="Rest logged" />
+              )}
+              {log.workouts?.length > 0 && (
+                <span className="mini-pillar-dot workout-d" title="Workout logged" />
+              )}
+              {hasMeals && (
+                <span className="mini-pillar-dot meal-d" title="Meals logged" />
+              )}
+              {hasDrinks && (
+                <span className="mini-pillar-dot drink-d" title="Drinks logged" />
+              )}
             </div>
           )}
         </div>
@@ -123,18 +154,40 @@ export default function DayLogCard({ date, log }) {
           ) : (
             <div className="day-log-sections">
 
-              {/* Sleep */}
+              {/* Rest (Sleep & Naps) */}
               <div className="day-log-section">
                 <span className="day-log-section-icon">🌙</span>
                 <div className="day-log-section-body">
-                  <span className="day-log-section-title">Sleep</span>
-                  {log.sleep?.bedTime ? (
-                    <span className="day-log-section-value">
-                      {log.sleep.bedTime} → {log.sleep.wakeTime}
-                      {log.sleep.durationMinutes > 0 &&
-                        <em> · {formatSleepDuration(log.sleep.durationMinutes)}</em>
+                  <span className="day-log-section-title">Rest</span>
+                  {(log.sleep?.fellAsleepTime || (log.naps && log.naps.length > 0)) ? (
+                    <div className="day-log-rest-chips">
+                      {log.sleep?.fellAsleepTime && log.sleep?.wokeUpTime && (
+                        <span className="day-log-rest-chip">
+                          🛌 <strong>Night Sleep</strong> · {formatTimeAMPM(log.sleep.fellAsleepTime)} – {formatTimeAMPM(log.sleep.wokeUpTime)}
+                          {log.sleep.crossesMidnight 
+                            ? ` (${formatDateShort(log.sleep.fellAsleepDate)} – ${formatDateShort(log.sleep.wokeUpDate)})` 
+                            : ` (${formatDateShort(log.sleep.wokeUpDate)})`
+                          }
+                          {log.sleep.duration > 0 &&
+                            <em> · {formatSleepDuration(log.sleep.duration)}</em>
+                          }
+                        </span>
+                      )}
+
+                      {log.naps && log.naps.length > 0 &&
+                        log.naps.map((nap, idx) => {
+                          const capTime = nap.timeOfDay
+                            ? nap.timeOfDay.charAt(0).toUpperCase() + nap.timeOfDay.slice(1)
+                            : "";
+                          return (
+                            <span key={nap._id || idx} className="day-log-rest-chip">
+                              😴 <strong>Nap ({capTime})</strong> · {formatTimeAMPM(nap.startTime)} – {formatTimeAMPM(nap.endTime)}
+                              <em> · {formatSleepDuration(nap.duration)}</em>
+                            </span>
+                          );
+                        })
                       }
-                    </span>
+                    </div>
                   ) : (
                     <span className="day-log-section-missing">Not logged</span>
                   )}

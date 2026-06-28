@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useTodayLog, useUpsertLog } from "../hooks/useTodayLog";
 import SleepSection from "../components/log/sleep/SleepSection";
 import WorkoutForm from "../components/log/WorkoutForm";
@@ -8,6 +9,7 @@ import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../hooks/useAuth";
 import { logApi } from "../api/logApi";
+import { useSleep } from "../hooks/useSleep";
 
 
 
@@ -27,34 +29,83 @@ export default function LogPage() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState("sleep");
+  const sleepHelper = useSleep();
+  const { sleepDraft, napDrafts, clearDrafts, sleepState } = sleepHelper;
+  const isSleeping = sleepState === "SLEEPING" || sleepState === "STALE";
+
+  // PWA Badging API — show home screen indicator while sleep session is active
+  useEffect(() => {
+    if (!("setAppBadge" in navigator)) return;
+    if (isSleeping) {
+      navigator.setAppBadge().catch(() => {});
+    } else {
+      navigator.clearAppBadge().catch(() => {});
+    }
+  }, [isSleeping]);
+
+  // Read the tab to open from router state (set by auto-redirect in Navbar)
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(
+    location.state?.tab ?? "sleep"
+  );
   const [workoutDraft, setWorkoutDraft] = useState(null);
   const [mealDraft, setMealDraft] = useState(null);
 
-  const sleep = todayLog?.sleep ?? null;
-  const workouts = workoutDraft ?? todayLog?.workouts ?? [];
-  const meals = mealDraft ?? todayLog?.meals ?? [];
+  const sleep = sleepDraft;
+  const workouts = workoutDraft ?? [];
+  const meals = mealDraft ?? [];
 
   const handleWorkoutsChange = (updatedSessions) => setWorkoutDraft(updatedSessions);
   const handleMealsChange = (updatedMeals) => setMealDraft(updatedMeals);
 
-  // Sync sleep only
+  // Sync sleep & naps
   const handleSaveSleep = () => {
+    const payload = {};
+    // Only send sleep if sleepDraft exists
+    if (sleepDraft) {
+      payload.sleep = sleepDraft;
+    }
+    // Append nap drafts to existing naps in database
+    payload.naps = [
+      ...(todayLog?.naps || []),
+      ...sleepHelper.napDrafts.map(({ isDraft, _id, ...nap }) => {
+        if (String(_id).startsWith("draft-nap-")) {
+          return nap;
+        }
+        return { _id, ...nap };
+      })
+    ];
+
     upsertLog(
-      { sleep },
+      payload,
       {
         onSuccess: () => {
-          toast.success("Sleep log synchronized ✓");
+          toast.success("Sleep & Nap data synchronized ✓");
+          clearDrafts();
         },
-        onError: () => toast.error("Failed to sync sleep log"),
+        onError: () => toast.error("Failed to sync sleep/nap logs"),
       }
     );
   };
 
   // Sync food & exercise only
   const handleSaveFoodExercise = () => {
+    const payload = {};
+    if (workoutDraft !== null) {
+      payload.workouts = [
+        ...(todayLog?.workouts || []),
+        ...workoutDraft
+      ];
+    }
+    if (mealDraft !== null) {
+      payload.meals = [
+        ...(todayLog?.meals || []),
+        ...mealDraft
+      ];
+    }
+
     upsertLog(
-      { workouts, meals },
+      payload,
       {
         onSuccess: () => {
           toast.success("Food & Exercise logs uploaded ✓");
@@ -76,15 +127,16 @@ export default function LogPage() {
   }
 
   // Determine logged state for each category
-  const sleepDone = !!(sleep && sleep.duration !== null);
-  const workoutDone = workouts.length > 0;
-  const mealsDone = meals.length > 0;
+  const sleepDone = !!((sleepDraft || todayLog?.sleep) && ((sleepDraft?.fellAsleepTime && sleepDraft?.wokeUpTime) || (todayLog?.sleep?.fellAsleepTime && todayLog?.sleep?.wokeUpTime)));
+  const workoutDone = (workoutDraft && workoutDraft.length > 0) || (todayLog?.workouts && todayLog.workouts.length > 0);
+  const mealsDone = (mealDraft && mealDraft.length > 0) || (todayLog?.meals && todayLog.meals.length > 0);
 
   const completedCount = [sleepDone, workoutDone, mealsDone].filter(Boolean).length;
 
   // Sleep snapshot value - show sleep or wake up timings instead of duration
   const getSleepSnapshotValue = () => {
-    if (!sleep || !sleep.fellAsleepTime || !sleep.wokeUpTime) return "—";
+    const activeSleep = sleepDraft || todayLog?.sleep;
+    if (!activeSleep || !activeSleep.fellAsleepTime || !activeSleep.wokeUpTime) return "—";
 
     const formatTime = (timeStr) => {
       const d = new Date(timeStr);
@@ -95,14 +147,38 @@ export default function LogPage() {
       return `${h}:${m} ${ampm}`;
     };
 
-    return `${formatTime(sleep.fellAsleepTime)} - ${formatTime(sleep.wokeUpTime)}`;
+    return `${formatTime(activeSleep.fellAsleepTime)} - ${formatTime(activeSleep.wokeUpTime)}`;
   };
 
   const tabs = [
-    { key: "sleep", label: "Sleep", dotColor: "#7F77DD", done: sleepDone },
+    { key: "sleep",   label: "Sleep",    dotColor: "#7F77DD", done: sleepDone },
     { key: "workout", label: "Exercise", dotColor: "#EF9F27", done: workoutDone },
-    { key: "meals", label: "Food", dotColor: "#1D9E75", done: mealsDone },
+    { key: "meals",   label: "Food",     dotColor: "#1D9E75", done: mealsDone },
   ];
+
+  const deleteDbWorkout = (idx) => {
+    if (!todayLog) return;
+    const updated = todayLog.workouts.filter((_, i) => i !== idx);
+    upsertLog({ workouts: updated });
+  };
+
+  const deleteDbMeal = (idx) => {
+    if (!todayLog) return;
+    const updated = todayLog.meals.filter((_, i) => i !== idx);
+    upsertLog({ meals: updated });
+  };
+
+  const deleteWorkoutDraft = (idx) => {
+    if (!workoutDraft) return;
+    const updated = workoutDraft.filter((_, i) => i !== idx);
+    setWorkoutDraft(updated.length > 0 ? updated : null);
+  };
+
+  const deleteMealDraft = (idx) => {
+    if (!mealDraft) return;
+    const updated = mealDraft.filter((_, i) => i !== idx);
+    setMealDraft(updated.length > 0 ? updated : null);
+  };
 
   return (
     <div className="log-page-container">
@@ -169,7 +245,7 @@ export default function LogPage() {
             <div className="log-form-panel">
               <div className="log-form-card">
                 {activeTab === "sleep" && (
-                  <SleepSection />
+                  <SleepSection sleepHelper={sleepHelper} />
                 )}
                 {activeTab === "workout" && (
                   <WorkoutForm
@@ -189,17 +265,23 @@ export default function LogPage() {
             </div>
           ) : (
             <ReviewPanel
+              todayLog={todayLog}
               sleepDone={sleepDone}
               sleepText={getSleepSnapshotValue()}
-              naps={todayLog?.naps ?? []}
-              workouts={workouts}
-              meals={meals}
               workoutDone={workoutDone}
               mealsDone={mealsDone}
               workoutDraft={workoutDraft}
               mealDraft={mealDraft}
+              sleepDraft={sleepDraft}
+              napDrafts={napDrafts}
               handleSaveSleep={handleSaveSleep}
               handleSaveFoodExercise={handleSaveFoodExercise}
+              deleteSleep={sleepHelper.deleteSleep}
+              deleteNap={sleepHelper.deleteNap}
+              deleteDbWorkout={deleteDbWorkout}
+              deleteDbMeal={deleteDbMeal}
+              deleteWorkoutDraft={deleteWorkoutDraft}
+              deleteMealDraft={deleteMealDraft}
               isPending={isPending}
             />
           )}

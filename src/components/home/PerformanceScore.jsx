@@ -54,7 +54,7 @@ const SaladIcon = () => (
 
 export default function PerformanceScore({ log }) {
   const hasScore = log && (
-    log.sleep?.bedTime ||
+    log.sleep?.fellAsleepTime ||
     (log.workouts?.length ?? 0) > 0 ||
     (log.meals?.length ?? 0) > 0
   );
@@ -139,10 +139,10 @@ export default function PerformanceScore({ log }) {
           <div className="score-stat-pills-row mt-8">
             <span className="stat-pill-item">
               <MoonIcon />
-              <span className="stat-pill-val" style={{ color: log?.sleep?.bedTime ? "inherit" : "var(--text-3)" }}>
-                {log?.sleep?.bedTime
-                  ? (log.sleep.durationMinutes
-                      ? `${Math.floor(log.sleep.durationMinutes / 60)}h ${log.sleep.durationMinutes % 60}m`
+              <span className="stat-pill-val" style={{ color: log?.sleep?.fellAsleepTime ? "inherit" : "var(--text-3)" }}>
+                {log?.sleep?.fellAsleepTime
+                  ? (log.sleep.duration
+                      ? `${Math.floor(log.sleep.duration / 60)}h ${log.sleep.duration % 60}m`
                       : "Logged")
                   : "—"}
               </span>

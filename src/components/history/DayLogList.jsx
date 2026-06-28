@@ -5,7 +5,7 @@ const PAGE_SIZE = 10;
 
 const FILTERS = [
   { key: "all",      label: "All" },
-  { key: "slept",    label: "Slept" },
+  { key: "slept",    label: "Rest" },
   { key: "trained",  label: "Worked Out" },
   { key: "meals",    label: "Meals" },
   { key: "drinks",   label: "Drinks" },
@@ -37,13 +37,13 @@ function passesFilter(entry, filter) {
   const { log } = entry;
   switch (filter) {
     case "all":      return true;
-    case "slept":    return !!log?.sleep?.bedTime;
+    case "slept":    return !!(log?.sleep?.fellAsleepTime && log?.sleep?.wokeUpTime);
     case "trained":  return (log?.workouts?.length ?? 0) > 0;
     case "meals":    return (log?.meals || []).some((m) => !DRINK_CATEGORIES.has(m.category));
     case "drinks":   return (log?.meals || []).some((m) => DRINK_CATEGORIES.has(m.category));
     case "complete": {
       if (!log) return false;
-      return !!log.sleep?.bedTime &&
+      return !!(log.sleep?.fellAsleepTime && log.sleep?.wokeUpTime) &&
              (log.workouts?.length ?? 0) > 0 &&
              (log.meals || []).some((m) => !DRINK_CATEGORIES.has(m.category));
     }
