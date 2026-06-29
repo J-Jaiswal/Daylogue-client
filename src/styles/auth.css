@@ -139,3 +139,80 @@
   color: var(--accent);
   font-weight: 600;
 }
+
+/* Password toggling container */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-input-container input {
+  width: 100%;
+  padding-right: 44px; /* Ensure space for the toggle button */
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: var(--r-sm);
+  transition: color 0.18s, background-color 0.18s;
+}
+
+.password-toggle-btn:hover {
+  color: var(--text);
+  background-color: var(--bg-card-hover);
+}
+
+/* User demographics 2x2 grid */
+.profile-grid-2x2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* Step 2 Back + Create Account button row */
+.auth-step2-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* =====================================================
+   MOBILE — Auth pages (≤ 600px)
+   ===================================================== */
+@media (max-width: 600px) {
+  .auth-card {
+    padding: 28px 18px;
+    border-radius: 20px;
+  }
+
+  /* Add-row: stretch full width on mobile */
+  .add-custom-chip-row {
+    max-width: 100%;
+  }
+
+  /* Add button: never shrink below readable size */
+  .add-custom-chip-row .pill-button,
+  .add-custom-chip-row button {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  /* Step 2 action row: stack vertically on narrow screens */
+  .auth-step2-actions {
+    grid-template-columns: 1fr;
+  }
+}

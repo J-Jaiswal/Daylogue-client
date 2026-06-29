@@ -5,6 +5,7 @@
 :root {
   --border-color: var(--border-strong, rgba(255, 255, 255, 0.1));
 }
+
 .profile-page-container {
   max-width: 900px;
   margin: 0 auto;
@@ -15,6 +16,7 @@
   box-sizing: border-box;
   animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+
 /* --- header --- */
 .profile-cinematic-header {
   display: flex;
@@ -131,6 +133,7 @@
   pointer-events: none;
   padding: 8px 0 0;
 }
+
 .profile-nav-segmented {
   pointer-events: auto;
   display: flex;
@@ -543,11 +546,25 @@
 }
 
 /* Margin helpers */
-.mt-4 { margin-top: 4px; }
-.mt-8 { margin-top: 8px; }
-.mt-12 { margin-top: 12px; }
-.mt-16 { margin-top: 16px; }
-.mt-24 { margin-top: 24px; }
+.mt-4 {
+  margin-top: 4px;
+}
+
+.mt-8 {
+  margin-top: 8px;
+}
+
+.mt-12 {
+  margin-top: 12px;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+.mt-24 {
+  margin-top: 24px;
+}
 
 .cinematic-empty-state {
   color: var(--text-3);
@@ -575,7 +592,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .profile-page-container {
     padding: 10px 16px 80px;
   }
@@ -595,8 +612,17 @@
     min-width: 85px;
   }
 
+  /* Tighten the gap between the tab divider line and the stats */
+  .profile-tabs-divider {
+    margin-bottom: 8px;
+  }
+
   .profile-stats-row {
-    gap: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 20px;
+    padding: 0 12px;
+    margin-top: 8px;
   }
 
   .profile-form-grid {
