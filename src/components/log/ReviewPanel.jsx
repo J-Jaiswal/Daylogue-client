@@ -273,7 +273,10 @@ export default function ReviewPanel({
                             {m.category}
                           </div>
                           <div className="log-entry-meta">
-                            {m.items.map((i) => `${i.name} (${i.amount})`).join(" · ")}
+                            {m.items.map((i) => {
+                              const suffix = i.times && i.times > 1 ? ` × ${i.times}` : "";
+                              return `${i.name} (${i.amount}${suffix})`;
+                            }).join(" · ")}
                           </div>
                         </div>
                       </div>

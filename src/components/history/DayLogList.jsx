@@ -30,7 +30,7 @@ function buildDateRange(days) {
 }
 
 const DRINK_CATEGORIES = new Set([
-  "water", "coffee", "tea", "juice", "protein_shake", "alcohol", "soda"
+  "water", "coffee", "tea", "juice", "protein_shake", "alcohol", "soda", "custom"
 ]);
 
 function passesFilter(entry, filter) {

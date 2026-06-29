@@ -18,6 +18,7 @@ const DRINK_CATEGORIES = [
   { value: "protein_shake", label: "Protein shake", icon: "🧃" },
   { value: "alcohol",       label: "Alcohol",       icon: "🍺" },
   { value: "soda",          label: "Soda",          icon: "🥃" },
+  { value: "custom",        label: "Custom",        icon: "🍹" },
 ];
 
 const catMeta = (val) => {
@@ -25,12 +26,17 @@ const catMeta = (val) => {
   return all.find((c) => c.value === val) || { icon: "🍽", label: val };
 };
 
-const emptyItem = () => ({ id: Date.now() + Math.random(), name: "", amount: "" });
+const emptyItem = (isDrink = false) => ({
+  id: Date.now() + Math.random(),
+  name: "",
+  amount: "",
+  times: isDrink ? 1 : undefined,
+});
 
 export default function MealForm({ meals, onSave, isPending }) {
   const [catGroup, setCatGroup] = useState("food"); // "food" or "drinks"
   const [category, setCategory] = useState("breakfast");
-  const [items, setItems]       = useState([emptyItem()]);
+  const [items, setItems]       = useState([emptyItem(false)]);
 
   const isDrink = catGroup === "drinks";
 
@@ -43,10 +49,10 @@ export default function MealForm({ meals, onSave, isPending }) {
   const handleGroupToggle = (group) => {
     setCatGroup(group);
     setCategory(group === "food" ? "breakfast" : "water");
-    setItems([emptyItem()]);
+    setItems([emptyItem(group === "drinks")]);
   };
 
-  const addItem    = () => setItems([...items, emptyItem()]);
+  const addItem    = () => setItems([...items, emptyItem(isDrink)]);
   const removeItem = (id) => {
     if (items.length === 1) return;
     setItems(items.filter((i) => i.id !== id));
@@ -68,15 +74,21 @@ export default function MealForm({ meals, onSave, isPending }) {
     const meta = catMeta(category);
     const meal = {
       category,
-      items: items.map((i) => ({
-        name: i.name.trim() || meta.label,
-        amount: i.amount.trim(),
-      })),
+      items: items.map((i) => {
+        const itemPayload = {
+          name: i.name.trim() || meta.label,
+          amount: i.amount.trim(),
+        };
+        if (isDrink) {
+          itemPayload.times = i.times ? Math.max(1, parseInt(i.times, 10) || 1) : 1;
+        }
+        return itemPayload;
+      }),
     };
 
     // Immediately update local state via onSave — removes tag from list too
     onSave([...(meals || []), meal]);
-    setItems([emptyItem()]);
+    setItems([emptyItem(isDrink)]);
     toast.success(`${meta.label} saved`);
   };
 
@@ -87,7 +99,7 @@ export default function MealForm({ meals, onSave, isPending }) {
   };
 
   const handleCancel = () => {
-    setItems([emptyItem()]);
+    setItems([emptyItem(catGroup === "drinks")]);
     setCategory(catGroup === "food" ? "breakfast" : "water");
   };
 
@@ -107,7 +119,8 @@ export default function MealForm({ meals, onSave, isPending }) {
               .map((it) => {
                 const isPlaceholder =
                   it.name.toLowerCase() === mc.label.toLowerCase();
-                return isPlaceholder ? it.amount : `${it.name} (${it.amount})`;
+                const suffix = it.times && it.times > 1 ? ` × ${it.times}` : "";
+                return isPlaceholder ? `${it.amount}${suffix}` : `${it.name} (${it.amount}${suffix})`;
               })
               .join(", ");
             return (
@@ -198,36 +211,61 @@ export default function MealForm({ meals, onSave, isPending }) {
         </div>
 
         {/* Food item rows */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginBottom: "8px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "16px" }}>
           {items.map((item) => (
-            <div key={item.id} className="food-item-row">
-              <div className="field-wrap" style={{ flex: 2 }}>
-                <input
-                  type="text"
-                  placeholder={
-                    isDrink ? "e.g. Water, Evian (optional)" : "e.g. Chicken breast"
-                  }
-                  value={item.name}
-                  onChange={(e) => updateItem(item.id, "name", e.target.value)}
-                />
+            <div key={item.id} className="food-item-block">
+              {/* Row 1: Name and Delete Cross Icon */}
+              <div className="food-item-row-1">
+                <div className="field-wrap" style={{ flex: 1 }}>
+                  <div className="field-label">NAME</div>
+                  <input
+                    type="text"
+                    placeholder={
+                      isDrink ? "e.g. Water, Evian (optional)" : "e.g. Chicken breast"
+                    }
+                    value={item.name}
+                    onChange={(e) => updateItem(item.id, "name", e.target.value)}
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="rm-btn"
+                  style={{ paddingBottom: "8px" }}
+                  onClick={() => removeItem(item.id)}
+                  disabled={items.length === 1}
+                  title="Remove item"
+                >
+                  ×
+                </button>
               </div>
-              <div className="field-wrap" style={{ flex: 1 }}>
-                <input
-                  type="text"
-                  placeholder={isDrink ? "e.g. 500ml" : "e.g. 300g"}
-                  value={item.amount}
-                  onChange={(e) => updateItem(item.id, "amount", e.target.value)}
-                />
+
+              {/* Row 2: Serving (+ Times for Drinks) */}
+              <div className="food-item-row-2">
+                <div className="field-wrap" style={{ width: "140px", flex: "none" }}>
+                  <div className="field-label">SERVING</div>
+                  <input
+                    type="text"
+                    placeholder={isDrink ? "e.g. 500ml" : "e.g. 300g"}
+                    value={item.amount}
+                    onChange={(e) => updateItem(item.id, "amount", e.target.value)}
+                  />
+                </div>
+                {isDrink && (
+                  <div className="field-wrap" style={{ width: "80px", flex: "none" }}>
+                    <div className="field-label">TIMES</div>
+                    <input
+                      type="number"
+                      min="1"
+                      placeholder="times"
+                      value={item.times === undefined || item.times === null ? "" : item.times}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        updateItem(item.id, "times", isNaN(val) ? "" : val);
+                      }}
+                    />
+                  </div>
+                )}
               </div>
-              <button
-                type="button"
-                className="rm-btn"
-                style={{ paddingBottom: "8px" }}
-                onClick={() => removeItem(item.id)}
-                disabled={items.length === 1}
-              >
-                ×
-              </button>
             </div>
           ))}
         </div>

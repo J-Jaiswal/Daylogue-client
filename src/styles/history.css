@@ -406,8 +406,8 @@
 .day-log-drink-chip {
   font-size: 12px;
   color: var(--text);
-  background: rgba(56,189,248,0.08);
-  border: 1px solid rgba(56,189,248,0.22);
+  background: var(--green-soft);
+  border: 1px solid rgba(16,217,160,0.22);
   border-radius: 999px;
   padding: 2px 10px;
   font-weight: 600;

@@ -64,6 +64,7 @@ export const DUMMY_LOGS = [
     meals: [
       { category: "breakfast", items: [{ name: "Eggs", amount: "3" }] },
       { category: "dinner", items: [{ name: "Chicken curry", amount: "1 bowl" }] },
+      { category: "coffee", items: [{ name: "Coffee", amount: "1 cup", times: 2 }] },
     ],
   },
   {

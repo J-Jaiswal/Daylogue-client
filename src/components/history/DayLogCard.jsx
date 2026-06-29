@@ -28,6 +28,7 @@ const drinkIcons = {
   protein_shake: "🧃",
   alcohol:       "🍺",
   soda:          "🥃",
+  custom:        "🍹",
   other:         "🫗",
 };
 
@@ -39,10 +40,11 @@ const drinkLabels = {
   protein_shake: "Protein Shake",
   alcohol:       "Alcohol",
   soda:          "Soda",
+  custom:        "Custom",
 };
 
 const DRINK_CATEGORIES = new Set([
-  "water", "coffee", "tea", "juice", "protein_shake", "alcohol", "soda"
+  "water", "coffee", "tea", "juice", "protein_shake", "alcohol", "soda", "custom"
 ]);
 
 const timeLabels = {
@@ -268,10 +270,11 @@ export default function DayLogCard({ date, log }) {
                           meal.items?.map((item, j) => {
                             const label = drinkLabels[meal.category] || meal.category;
                             const hasCustomName = item.name && item.name.toLowerCase() !== label.toLowerCase();
+                            const suffix = item.times && item.times > 1 ? ` × ${item.times}` : "";
                             return (
                               <span key={`${i}-${j}`} className="day-log-drink-chip">
                                 {drinkIcons[meal.category] || "🫗"}{" "}
-                                {label} · {item.amount}
+                                {label} · {item.amount}{suffix}
                                 {hasCustomName && <em> ({item.name})</em>}
                               </span>
                             );
